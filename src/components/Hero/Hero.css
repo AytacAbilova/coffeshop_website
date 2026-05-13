@@ -27,6 +27,10 @@
   position: relative;
   z-index: 2;
   padding: 56px 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 70%;
 }
 
 .hero__tagline {
@@ -145,10 +149,12 @@
   filter: drop-shadow(-12px 8px 24px rgba(0, 0, 0, 0.5));
 }
 
-/* ── Tablet (≤ 900px) ──────────────────────────── */
-@media (max-width: 900px) {
+/* ── Tablet (≤ 992px) ──────────────────────────── */
+@media (max-width: 992px) {
   .hero__content {
     padding: 40px 40px;
+    max-width: 100%;
+    justify-content: flex-start;
   }
 
   .hero__cup {
@@ -156,6 +162,7 @@
     right: 4%;
   }
 }
+
 
 /* ── Mobile (≤ 600px) ──────────────────────────── */
 @media (max-width: 600px) {
@@ -188,5 +195,5 @@
 
   .hero__torn {
     height: 70px;
-  } 
+  }
 }
