@@ -14,7 +14,9 @@ export default function Hero() {
           Start your day with
           <br />a black Coffee
         </h1>
-        <button className="hero__btn">BUY NOW</button>
+        <div>
+          <button className="hero__btn">BUY NOW</button>
+        </div>
       </div>
 
       {/* Coffee cup image */}
