@@ -28,8 +28,7 @@ import {
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
-import Contact from "./Pages/Contact/Contact";
-
+import Wishlist from "./pages/Wishlist/Wishlist";
 
 const requireAdminLoader = () => {
   if (!isAdminAuthed()) return redirect("/admin/login");
@@ -56,9 +55,7 @@ const router = createBrowserRouter([
       { path: "/menu/:id", element: <Detail /> },
       { path: "/menu", element: <Menu /> },
       { path: "/myorders", element: <MyOrders /> },
-      { path: "/contact", element: <Contact /> }
-
-
+      { path: "/wishlist", element: <Wishlist /> },
     ],
   },
 
