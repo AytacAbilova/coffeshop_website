@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { label: "RESERVATION", to: "/reservation" },
   { label: "MENU", to: "/menu" },
   { label: "MY ORDERS", to: "/myorders" },
+  { label: "CONTACT", to: "/contact" },
 ];
 
 export default function NavList() {

@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 
 export default function Menu() {
   const navigate = useNavigate();
+
   const menuItems = useMemo(() => getMenuItems(), []);
 
   const [cartOpen, setCartOpen] = useState(false);
@@ -190,7 +191,14 @@ export default function Menu() {
 
         <div className="menu-grid">
           {menuItems.map((item) => (
-            <div key={item.id} className="menu-card">
+            <div
+              key={item.id}
+              className="menu-card"
+              onClick={() =>
+                navigate(`/menu/${item.id}`)
+              }
+              style={{ cursor: "pointer" }}
+            >
               <div className="menu-card__imgWrap">
                 {item.imageUrl ? (
                   <img
@@ -234,7 +242,10 @@ export default function Menu() {
 
                   <button
                     className="menu-card__add"
-                    onClick={() => addToCart(item)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(item);
+                    }}
                   >
                     Səbətə at
                   </button>
@@ -245,7 +256,6 @@ export default function Menu() {
         </div>
       </div>
 
-      {/* CART */}
       {cartOpen && (
         <div
           className="cartOverlay"
