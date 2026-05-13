@@ -3,20 +3,29 @@ import {
   redirect,
   RouterProvider,
 } from "react-router-dom";
+
 import "./index.css";
+
 import Home from "./pages/Home/Home";
 import Reservation from "./pages/Reservation/Reservation";
+import CardDetail from "./pages/Detail/Detail";
 import Layout from "./components/layout/Layout";
 import Menu from "./pages/Menu/Menu";
 import MyOrders from "./pages/My orders/MyOrders";
 import NotFoundPage from "./pages/NotFoundPage";
+
 import AdminLayout from "./pages/Admin/AdminLayout";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminMenu from "./pages/Admin/AdminMenu";
 import AdminStaff from "./pages/Admin/AdminStaff";
 import AdminTables from "./pages/Admin/AdminTables";
-import { clearAdminAuth, isAdminAuthed } from "./pages/Admin/adminStorage";
+
+import {
+  clearAdminAuth,
+  isAdminAuthed,
+} from "./pages/Admin/adminStorage";
+
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 
@@ -40,29 +49,34 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { path: "/", element: <Home /> },
-      { path: "/reservation", element: <Reservation /> },
-      { path: "/menu", element: <Menu /> },
-      { path: "/myorders", element: <MyOrders /> },
+      { index: true, element: <Home /> },
+
+      // RESERVATION DETAIL
+      { path: "reservation", element: <Reservation /> },
+      { path: "reservation/:type", element: <CardDetail /> },
+
+      // MENU DETAIL (❗ BUNU ƏLAVƏ ETDİM)
+      { path: "menu/:id", element: <CardDetail /> },
+
+      { path: "menu", element: <Menu /> },
+      { path: "myorders", element: <MyOrders /> },
     ],
   },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
+
+  { path: "/login", element: <Login /> },
+  { path: "/register", element: <Register /> },
+
   {
     path: "/admin/login",
     loader: adminLoginLoader,
     element: <AdminLogin />,
   },
+
   {
     path: "/admin/logout",
     loader: adminLogoutLoader,
   },
+
   {
     path: "/admin",
     loader: requireAdminLoader,
@@ -74,10 +88,8 @@ const router = createBrowserRouter([
       { path: "tables", element: <AdminTables /> },
     ],
   },
-  {
-    path: "*",
-    element: <NotFoundPage />,
-  },
+
+  { path: "*", element: <NotFoundPage /> },
 ]);
 
 function App() {
