@@ -116,4 +116,4 @@ function Detail() {
   );
 }
 
-export default CardDetail;
+export default Detail;
