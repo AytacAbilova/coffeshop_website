@@ -50,7 +50,7 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  z-index: 200;
+  z-index: 300;
 }
 
 .nav__hamburger span {
