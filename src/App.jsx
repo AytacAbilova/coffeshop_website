@@ -8,7 +8,7 @@ import "./index.css";
 
 import Home from "./pages/Home/Home";
 import Reservation from "./pages/Reservation/Reservation";
-import CardDetail from "./pages/Detail/Detail";
+import Detail from "./pages/Detail/Detail";
 import Layout from "./components/layout/Layout";
 import Menu from "./pages/Menu/Menu";
 import MyOrders from "./pages/My orders/MyOrders";
@@ -53,6 +53,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/reservation", element: <Reservation /> },
+      { path: "/menu/:id", element: <Detail /> },
       { path: "/menu", element: <Menu /> },
       { path: "/myorders", element: <MyOrders /> },
       { path: "/contact", element: <Contact /> }

@@ -4,7 +4,6 @@
     url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
   background-size: cover;
   background-position: center;
-  min-height: 100vh;
   padding: 42px 0 70px;
   color: #f5f5f5;
 }

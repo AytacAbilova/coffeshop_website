@@ -2,8 +2,8 @@
 
 /* ─── Page ──────────────────────────────────────────────── */
 .detailPage {
-  background: #381c09;
-  background-image: url(https://img.magnific.com/free-vector/cafe-pattern-background-coffee-cake-vector-illustration_53876-136844.jpg?semt=ais_hybrid&w=740&q=80);
+  min-height: 100vh;
+  background: #1a0d05;
   padding: 2.5rem 1.5rem 5rem;
   font-family: "DM Sans", sans-serif;
 }
@@ -63,13 +63,12 @@
 
 .detailLayout__imgFallback {
   min-height: 420px;
-  /* background: linear-gradient(160deg, #3d1f08 0%, #1e0e04 100%); */
+  background: linear-gradient(160deg, #3d1f08 0%, #1e0e04 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 8rem;
-  /* opacity: 0.3; */
-  background-color: #876636;
+  font-size: 5rem;
+  opacity: 0.3;
 }
 
 /* ─── Right: Info ───────────────────────────────────────── */
