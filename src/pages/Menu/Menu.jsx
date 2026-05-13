@@ -27,6 +27,7 @@ export default function Menu() {
   const [cart, setCart] = useState(() => getCart());
   const [wishlist, setWishlist] = useState(() => getWishlist());
 
+  
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [note, setNote] = useState("");
