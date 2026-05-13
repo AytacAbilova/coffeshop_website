@@ -8,7 +8,7 @@ import "./index.css";
 
 import Home from "./pages/Home/Home";
 import Reservation from "./pages/Reservation/Reservation";
-import CardDetail from "./pages/Detail/Detail";
+import Detail from "./pages/Detail/Detail";
 import Layout from "./components/layout/Layout";
 import Menu from "./pages/Menu/Menu";
 import MyOrders from "./pages/My orders/MyOrders";
@@ -28,6 +28,7 @@ import {
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
+import Wishlist from "./pages/Wishlist/Wishlist";
 
 const requireAdminLoader = () => {
   if (!isAdminAuthed()) return redirect("/admin/login");
@@ -49,17 +50,12 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { index: true, element: <Home /> },
-
-      // RESERVATION DETAIL
-      { path: "reservation", element: <Reservation /> },
-      { path: "reservation/:type", element: <CardDetail /> },
-
-      // MENU DETAIL (❗ BUNU ƏLAVƏ ETDİM)
-      { path: "menu/:id", element: <CardDetail /> },
-
-      { path: "menu", element: <Menu /> },
-      { path: "myorders", element: <MyOrders /> },
+      { path: "/", element: <Home /> },
+      { path: "/reservation", element: <Reservation /> },
+      { path: "/menu/:id", element: <Detail /> },
+      { path: "/menu", element: <Menu /> },
+      { path: "/myorders", element: <MyOrders /> },
+      { path: "/wishlist", element: <Wishlist /> },
     ],
   },
 

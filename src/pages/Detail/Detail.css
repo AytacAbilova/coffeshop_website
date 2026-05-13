@@ -63,13 +63,12 @@
 
 .detailLayout__imgFallback {
   min-height: 420px;
-  /* background: linear-gradient(160deg, #3d1f08 0%, #1e0e04 100%); */
+  background: linear-gradient(160deg, #3d1f08 0%, #1e0e04 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 8rem;
-  /* opacity: 0.3; */
-  background-color: #876636;
+  font-size: 5rem;
+  opacity: 0.3;
 }
 
 /* ─── Right: Info ───────────────────────────────────────── */

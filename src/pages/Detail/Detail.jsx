@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { getMenuItems, getCart, saveCart } from "../Admin/adminStorage";
 import "./Detail.css";
 
-function CardDetail() {
+function Detail() {
   const { type, id } = useParams();
   const navigate = useNavigate();
   const menuItems = useMemo(() => getMenuItems(), []);
@@ -116,4 +116,4 @@ function CardDetail() {
   );
 }
 
-export default CardDetail;
+export default Detail;
