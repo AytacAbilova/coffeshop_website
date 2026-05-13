@@ -8,20 +8,21 @@ const styles = {
     gap: "14px",
   },
   panel: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: "16px",
-    padding: "14px",
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "18px",
+    padding: "16px",
+    boxShadow: "0 10px 30px rgba(17, 24, 39, 0.06)",
   },
-  title: { margin: 0, fontSize: "14px", fontWeight: 800 },
+  title: { margin: 0, fontSize: "14px", fontWeight: 950, color: "#111827" },
   row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
-  field: { display: "grid", gap: "6px", fontSize: "13px", opacity: 0.9 },
+  field: { display: "grid", gap: "6px", fontSize: "13px", color: "#374151" },
   input: {
     padding: "10px 12px",
     borderRadius: "12px",
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "rgba(0,0,0,0.35)",
-    color: "#e8eef6",
+    border: "1px solid #e5e7eb",
+    background: "#ffffff",
+    color: "#111827",
     outline: "none",
   },
   actions: { display: "flex", gap: "8px", flexWrap: "wrap" },
@@ -30,15 +31,15 @@ const styles = {
     borderRadius: "12px",
     border:
       variant === "danger"
-        ? "1px solid rgba(239, 68, 68, 0.45)"
-        : "1px solid rgba(99, 102, 241, 0.45)",
+        ? "1px solid rgba(239, 68, 68, 0.35)"
+        : "1px solid rgba(79, 70, 229, 0.28)",
     background:
       variant === "danger"
-        ? "rgba(239, 68, 68, 0.12)"
-        : "rgba(99, 102, 241, 0.25)",
-    color: "#ffffff",
+        ? "rgba(239, 68, 68, 0.08)"
+        : "rgba(79, 70, 229, 0.10)",
+    color: variant === "danger" ? "#991b1b" : "#1e1b4b",
     cursor: "pointer",
-    fontWeight: 700,
+    fontWeight: 900,
   }),
   table: {
     width: "100%",
@@ -47,22 +48,27 @@ const styles = {
   },
   th: {
     textAlign: "left",
-    opacity: 0.8,
+    color: "#6b7280",
     padding: "10px 8px",
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    borderBottom: "1px solid #e5e7eb",
+    fontWeight: 900,
   },
   td: {
     padding: "10px 8px",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
+    borderBottom: "1px solid #f1f5f9",
     verticalAlign: "top",
+    color: "#111827",
   },
   chip: {
     display: "inline-block",
     padding: "4px 10px",
     borderRadius: "999px",
-    background: "rgba(255,255,255,0.06)",
+    background: "#f3f4f6",
+    border: "1px solid #e5e7eb",
+    color: "#374151",
+    fontWeight: 800,
   },
-  empty: { opacity: 0.75, margin: 0, fontSize: "13px" },
+  empty: { color: "#6b7280", margin: 0, fontSize: "13px" },
 };
 
 function normalizePrice(value) {
@@ -234,7 +240,7 @@ export default function AdminMenu() {
                           href={it.imageUrl}
                           target="_blank"
                           rel="noreferrer"
-                          style={{ color: "#cfe0f3" }}
+                          style={{ color: "#4f46e5", fontWeight: 900, textDecoration: "none" }}
                         >
                           link
                         </a>

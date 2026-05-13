@@ -3,19 +3,20 @@ import { ensureTableCount, getTables, saveTables } from "./adminStorage";
 
 const styles = {
   panel: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: "16px",
-    padding: "14px",
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "18px",
+    padding: "16px",
+    boxShadow: "0 10px 30px rgba(17, 24, 39, 0.06)",
   },
-  title: { margin: 0, fontSize: "14px", fontWeight: 800 },
-  field: { display: "grid", gap: "6px", fontSize: "13px", opacity: 0.9 },
+  title: { margin: 0, fontSize: "14px", fontWeight: 950, color: "#111827" },
+  field: { display: "grid", gap: "6px", fontSize: "13px", color: "#374151" },
   input: {
     padding: "10px 12px",
     borderRadius: "12px",
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "rgba(0,0,0,0.35)",
-    color: "#e8eef6",
+    border: "1px solid #e5e7eb",
+    background: "#ffffff",
+    color: "#111827",
     outline: "none",
   },
   actions: { display: "flex", gap: "8px", flexWrap: "wrap" },
@@ -24,15 +25,15 @@ const styles = {
     borderRadius: "12px",
     border:
       variant === "danger"
-        ? "1px solid rgba(239, 68, 68, 0.45)"
-        : "1px solid rgba(99, 102, 241, 0.45)",
+        ? "1px solid rgba(239, 68, 68, 0.35)"
+        : "1px solid rgba(79, 70, 229, 0.28)",
     background:
       variant === "danger"
-        ? "rgba(239, 68, 68, 0.12)"
-        : "rgba(99, 102, 241, 0.25)",
-    color: "#ffffff",
+        ? "rgba(239, 68, 68, 0.08)"
+        : "rgba(79, 70, 229, 0.10)",
+    color: variant === "danger" ? "#991b1b" : "#1e1b4b",
     cursor: "pointer",
-    fontWeight: 700,
+    fontWeight: 900,
   }),
   grid: {
     marginTop: "12px",
@@ -42,9 +43,10 @@ const styles = {
   },
   card: {
     padding: "12px",
-    borderRadius: "14px",
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "rgba(0,0,0,0.25)",
+    borderRadius: "16px",
+    border: "1px solid #e5e7eb",
+    background: "linear-gradient(180deg, #ffffff 0%, #fbfdff 100%)",
+    boxShadow: "0 10px 22px rgba(17, 24, 39, 0.06)",
   },
   cardTop: {
     display: "flex",
@@ -52,21 +54,21 @@ const styles = {
     justifyContent: "space-between",
     gap: "10px",
   },
-  number: { margin: 0, fontWeight: 900 },
+  number: { margin: 0, fontWeight: 950, color: "#111827" },
   select: {
     padding: "8px 10px",
     borderRadius: "12px",
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "rgba(0,0,0,0.35)",
-    color: "#e8eef6",
+    border: "1px solid #e5e7eb",
+    background: "#ffffff",
+    color: "#111827",
     outline: "none",
   },
   chip: (status) => {
     const map = {
-      available: { bg: "rgba(34, 197, 94, 0.18)", border: "rgba(34, 197, 94, 0.30)" },
-      reserved: { bg: "rgba(234, 179, 8, 0.18)", border: "rgba(234, 179, 8, 0.30)" },
-      occupied: { bg: "rgba(239, 68, 68, 0.18)", border: "rgba(239, 68, 68, 0.30)" },
-      disabled: { bg: "rgba(148, 163, 184, 0.14)", border: "rgba(148, 163, 184, 0.22)" },
+      available: { bg: "rgba(34, 197, 94, 0.10)", border: "rgba(34, 197, 94, 0.22)", color: "#065f46" },
+      reserved: { bg: "rgba(234, 179, 8, 0.12)", border: "rgba(234, 179, 8, 0.22)", color: "#92400e" },
+      occupied: { bg: "rgba(239, 68, 68, 0.10)", border: "rgba(239, 68, 68, 0.22)", color: "#991b1b" },
+      disabled: { bg: "rgba(148, 163, 184, 0.10)", border: "rgba(148, 163, 184, 0.22)", color: "#475569" },
     };
     const c = map[status] || map.available;
     return {
@@ -76,10 +78,11 @@ const styles = {
       background: c.bg,
       border: `1px solid ${c.border}`,
       fontSize: "12px",
-      opacity: 0.95,
+      color: c.color,
+      fontWeight: 900,
     };
   },
-  hint: { margin: "10px 0 0", opacity: 0.75, fontSize: "12px" },
+  hint: { margin: "10px 0 0", color: "#6b7280", fontSize: "12px", fontWeight: 800 },
 };
 
 const STATUS_LABEL = {

@@ -8,15 +8,16 @@ const styles = {
     gap: "12px",
   },
   card: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: "16px",
-    padding: "14px",
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "18px",
+    padding: "16px",
+    boxShadow: "0 10px 30px rgba(17, 24, 39, 0.06)",
   },
-  title: { margin: 0, opacity: 0.8, fontSize: "13px" },
-  value: { margin: "6px 0 0", fontSize: "26px", fontWeight: 800 },
-  sectionTitle: { margin: "18px 0 10px", fontSize: "14px", fontWeight: 700 },
-  list: { margin: 0, paddingLeft: "18px", opacity: 0.85 },
+  title: { margin: 0, color: "#6b7280", fontSize: "13px", fontWeight: 800 },
+  value: { margin: "6px 0 0", fontSize: "28px", fontWeight: 950, color: "#111827" },
+  sectionTitle: { margin: "18px 0 10px", fontSize: "14px", fontWeight: 900, color: "#111827" },
+  list: { margin: 0, paddingLeft: "18px", color: "#374151" },
 };
 
 export default function AdminDashboard() {
