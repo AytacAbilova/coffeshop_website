@@ -1,0 +1,231 @@
+/* Reservation.css */
+
+.reservation {
+  position: relative;
+  min-height: 90vh;
+  overflow: hidden;
+  background-image: url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  padding: 40px 8%;
+  box-sizing: border-box;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 7, 3, 0.78);
+  backdrop-filter: blur(2px);
+}
+
+.reservationContainer {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 70px;
+  position: relative;
+  z-index: 2;
+}
+
+.reservationLeft {
+  flex: 1;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.subTitle {
+  color: #d8a25e;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+}
+
+.reservationLeft h1 {
+  font-size: 70px;
+  line-height: 85px;
+  margin-bottom: 25px;
+  font-weight: 800;
+}
+
+.reservationLeft p {
+  color: #d4d4d4;
+  font-size: 17px;
+  line-height: 30px;
+  width: 85%;
+  margin-bottom: 40px;
+}
+
+.infoCards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 25px;
+  border-radius: 18px;
+  width: 220px;
+  backdrop-filter: blur(8px);
+  transition: 0.4s;
+  box-sizing: border-box;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  background: rgba(216, 162, 94, 0.15);
+}
+
+.card h3 {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.card p {
+  margin: 0;
+  color: #cfcfcf;
+  font-size: 15px;
+  line-height: 24px;
+}
+
+.reservationRight {
+  flex: 0 0 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+}
+
+.reservationForm {
+  width: 100%;
+  background: rgba(28, 18, 12, 0.92);
+  padding: 45px;
+  border-radius: 30px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(216, 162, 94, 0.2);
+  box-sizing: border-box;
+}
+
+.reservationForm h2 {
+  color: white;
+  margin-bottom: 30px;
+  font-size: 34px;
+  text-align: center;
+}
+
+.reservationForm input,
+.reservationForm textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+  outline: none;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  color: white;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.reservationForm textarea {
+  height: 130px;
+  resize: none;
+}
+
+.reservationForm input::placeholder,
+.reservationForm textarea::placeholder {
+  color: #b9b9b9;
+}
+
+.doubleInput {
+  display: flex;
+  gap: 15px;
+}
+
+.doubleInput input {
+  width: 100%;
+}
+
+.reservationForm button {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 50px;
+  background: #d8a25e;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: 0.4s;
+}
+
+.reservationForm button:hover {
+  background: #f0b56d;
+  transform: scale(1.02);
+}
+
+@media screen and (max-width: 1100px) {
+  .reservation {
+    padding: 120px 8% 60px;
+  }
+
+  .reservationContainer {
+    flex-direction: column;
+  }
+
+  .reservationLeft,
+  .reservationRight {
+    width: 100%;
+  }
+
+  .reservationRight {
+    margin-top: 30px;
+  }
+
+  .reservationLeft h1 {
+    font-size: 55px;
+    line-height: 70px;
+  }
+
+  .reservationLeft p {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .reservation {
+    padding: 100px 5% 50px;
+  }
+
+  .reservationLeft h1 {
+    font-size: 42px;
+    line-height: 55px;
+  }
+
+  .infoCards {
+    flex-direction: column;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  .doubleInput {
+    flex-direction: column;
+  }
+
+  .reservationForm {
+    padding: 30px 20px;
+  }
+}
