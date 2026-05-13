@@ -18,6 +18,7 @@ import "./Menu.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { toast } from "react-toastify";
 
+
 export default function Menu() {
   const navigate = useNavigate();
   const menuItems = useMemo(() => getMenuItems(), []);
