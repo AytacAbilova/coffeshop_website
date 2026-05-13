@@ -2,8 +2,7 @@
 
 .hero {
   position: relative;
-  width: 100%;
-  height: 520px;
+  height: 90vh;
   overflow: hidden;
   background-color: #2b1508;
   background-image: url("https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80");
@@ -12,7 +11,6 @@
   font-family: "Lato", sans-serif;
 }
 
-/* dark left-side gradient so text is readable */
 .hero__overlay {
   position: absolute;
   inset: 0;
@@ -25,12 +23,10 @@
   z-index: 1;
 }
 
-/* text block */
 .hero__content {
   position: relative;
   z-index: 2;
   padding: 56px 64px;
-  max-width: 560px;
 }
 
 .hero__tagline {
@@ -71,7 +67,7 @@
   color: #ffffff;
 }
 
-/* torn / splatter white edge at the bottom */
+/* torn white edge */
 .hero__torn {
   position: absolute;
   bottom: -2px;
@@ -80,8 +76,6 @@
   height: 110px;
   z-index: 3;
   background: white;
-
-  /* jagged / torn mask using SVG clip-path */
   clip-path: polygon(
     0% 100%,
     0% 60%,
@@ -139,14 +133,61 @@
   );
 }
 
-/* coffee cup image — right side, sitting on the torn edge */
+/* coffee cup */
 .hero__cup {
   position: absolute;
   right: 8%;
   bottom: 0;
-  height: 95%;
+  height: 85%;
   width: auto;
   object-fit: contain;
   z-index: 4;
   filter: drop-shadow(-12px 8px 24px rgba(0, 0, 0, 0.5));
+}
+
+/* ── Tablet (≤ 900px) ──────────────────────────── */
+@media (max-width: 900px) {
+  .hero__content {
+    padding: 40px 40px;
+  }
+
+  .hero__cup {
+    height: 80%;
+    right: 4%;
+  }
+}
+
+/* ── Mobile (≤ 600px) ──────────────────────────── */
+@media (max-width: 600px) {
+  .hero {
+    height: 100svh;
+    background-position: 70% 40%;
+  }
+
+  /* stronger overlay so text stays readable when cup is behind */
+  .hero__overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(10, 4, 0, 0.75) 0%,
+      rgba(10, 4, 0, 0.55) 60%,
+      rgba(10, 4, 0, 0.2) 100%
+    );
+  }
+
+  .hero__content {
+    padding: 40px 24px;
+    max-width: 100%;
+  }
+
+  .hero__cup {
+    height: 50%;
+    right: 50%;
+    transform: translateX(50%);
+    bottom: 70px;
+  }
+
+  .hero__torn {
+    height: 70px;
+  } 
+  
 }
