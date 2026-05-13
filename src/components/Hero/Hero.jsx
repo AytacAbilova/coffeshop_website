@@ -25,6 +25,7 @@ export default function Hero() {
 
       {/* Bottom torn white edge */}
       <div className="hero__torn" />
+      
     </section>
   );
 }
