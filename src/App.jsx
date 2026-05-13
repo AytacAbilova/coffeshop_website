@@ -18,6 +18,7 @@ import AdminStaff from "./pages/Admin/AdminStaff";
 import AdminTables from "./pages/Admin/AdminTables";
 import { clearAdminAuth, isAdminAuthed } from "./pages/Admin/adminStorage";
 import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
 
 const requireAdminLoader = () => {
   if (!isAdminAuthed()) return redirect("/admin/login");
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
   },
   {
     path: "/admin/login",
