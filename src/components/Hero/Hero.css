@@ -1,0 +1,152 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap");
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  overflow: hidden;
+  background-color: #2b1508;
+  background-image: url("https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80");
+  background-size: cover;
+  background-position: center 40%;
+  font-family: "Lato", sans-serif;
+}
+
+/* dark left-side gradient so text is readable */
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(10, 4, 0, 0.72) 0%,
+    rgba(10, 4, 0, 0.35) 55%,
+    rgba(10, 4, 0, 0) 100%
+  );
+  z-index: 1;
+}
+
+/* text block */
+.hero__content {
+  position: relative;
+  z-index: 2;
+  padding: 56px 64px;
+  max-width: 560px;
+}
+
+.hero__tagline {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+
+.hero__title {
+  color: #ffffff;
+  font-size: clamp(36px, 5vw, 62px);
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0 0 32px;
+}
+
+.hero__btn {
+  display: inline-block;
+  padding: 12px 32px;
+  background: #ffffff;
+  color: #1a0a00;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.hero__btn:hover {
+  background: #d4a843;
+  color: #ffffff;
+}
+
+/* torn / splatter white edge at the bottom */
+.hero__torn {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 110px;
+  z-index: 3;
+  background: white;
+
+  /* jagged / torn mask using SVG clip-path */
+  clip-path: polygon(
+    0% 100%,
+    0% 60%,
+    2% 45%,
+    4% 55%,
+    6% 38%,
+    8% 50%,
+    10% 30%,
+    12% 48%,
+    14% 25%,
+    16% 42%,
+    18% 20%,
+    20% 38%,
+    22% 15%,
+    24% 35%,
+    26% 18%,
+    28% 40%,
+    30% 22%,
+    32% 45%,
+    34% 28%,
+    36% 50%,
+    38% 30%,
+    40% 55%,
+    42% 35%,
+    44% 58%,
+    46% 38%,
+    48% 60%,
+    50% 40%,
+    52% 62%,
+    54% 42%,
+    56% 65%,
+    58% 45%,
+    60% 68%,
+    62% 48%,
+    64% 70%,
+    66% 50%,
+    68% 72%,
+    70% 52%,
+    72% 70%,
+    74% 55%,
+    76% 68%,
+    78% 58%,
+    80% 65%,
+    82% 60%,
+    84% 68%,
+    86% 62%,
+    88% 70%,
+    90% 65%,
+    92% 72%,
+    94% 68%,
+    96% 75%,
+    98% 70%,
+    100% 72%,
+    100% 100%
+  );
+}
+
+/* coffee cup image — right side, sitting on the torn edge */
+.hero__cup {
+  position: absolute;
+  right: 8%;
+  bottom: 0;
+  height: 95%;
+  width: auto;
+  object-fit: contain;
+  z-index: 4;
+  filter: drop-shadow(-12px 8px 24px rgba(0, 0, 0, 0.5));
+}
