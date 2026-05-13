@@ -1,4 +1,5 @@
 import "./Hero.css";
+import coffeeCup from "../../assets/img/coffeeCup.png";
 
 export default function Hero() {
   return (
@@ -7,7 +8,7 @@ export default function Hero() {
       <div className="hero__overlay" />
 
       {/* Content */}
-      <div className="hero__content">
+      <div className="hero__content container">
         <p className="hero__tagline">NOW YOU CAN FEEL THE ENERGY</p>
         <h1 className="hero__title">
           Start your day with
@@ -17,11 +18,7 @@ export default function Hero() {
       </div>
 
       {/* Coffee cup image */}
-      <img
-        src="https://static.vecteezy.com/system/resources/previews/043/558/833/original/take-away-coffee-cup-mockup-on-isolated-transparent-background-free-png.png"
-        alt="Coffee Cup"
-        className="hero__cup"
-      />
+      <img src={coffeeCup} alt="Coffee Cup" className="hero__cup" />
 
       {/* Bottom torn white edge */}
       <div className="hero__torn" />

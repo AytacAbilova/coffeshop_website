@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import "./Navlist.css";
+import "./NavList.css";
 
 const NAV_LINKS = [
   { label: "HOME", to: "/" },
@@ -10,19 +11,35 @@ const NAV_LINKS = [
 
 export default function NavList() {
   const { pathname } = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <ul className="nav-list">
-      {NAV_LINKS.map(({ label, to }) => (
-        <li key={to}>
-          <Link
-            to={to}
-            className={`nav-list__link${pathname === to ? " active" : ""}`}
-          >
-            {label}
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <nav className="nav">
+      {/* Hamburger button — mobile only */}
+      <button
+        className={`nav__hamburger${menuOpen ? " open" : ""}`}
+        onClick={() => setMenuOpen((prev) => !prev)}
+        aria-label="Toggle menu"
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {/* Link list */}
+      <ul className={`nav-list${menuOpen ? " nav-list--open" : ""}`}>
+        {NAV_LINKS.map(({ label, to }) => (
+          <li key={to}>
+            <Link
+              to={to}
+              className={`nav-list__link${pathname === to ? " active" : ""}`}
+              onClick={() => setMenuOpen(false)}
+            >
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
