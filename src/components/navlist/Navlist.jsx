@@ -1,25 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./Navlist.css";
 
-const Navlist = () => {
-  return (
-    <div >
-      <ul className="list">
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/reservation">Reservation</Link>
-        </li>
-        <li>
-          <Link to="/menu">Menu</Link>
-        </li>
-        <li>
-          <Link to="/myorders">My Orders</Link>
-        </li>
-      </ul>
-    </div>
-  );
-};
+const NAV_LINKS = [
+  { label: "HOME", to: "/" },
+  { label: "RESERVATION", to: "/reservation" },
+  { label: "MENU", to: "/menu" },
+  { label: "MY ORDERS", to: "/myorders" },
+];
 
-export default Navlist;
+export default function NavList() {
+  const { pathname } = useLocation();
+
+  return (
+    <ul className="nav-list">
+      {NAV_LINKS.map(({ label, to }) => (
+        <li key={to}>
+          <Link
+            to={to}
+            className={`nav-list__link${pathname === to ? " active" : ""}`}
+          >
+            {label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
