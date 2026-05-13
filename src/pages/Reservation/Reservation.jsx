@@ -1,11 +1,8 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { createReservation, getTables } from "../Admin/adminStorage";
 import "./Reservation.css";
 
 function Reservation() {
-  const navigate = useNavigate();
-
   const availableTables = useMemo(
     () => getTables().filter((t) => t && t.status === "available"),
     []
@@ -44,7 +41,6 @@ function Reservation() {
     if (!payload.guests || payload.guests < 1) return;
 
     createReservation(payload);
-
     setName("");
     setEmail("");
     setDate("");
@@ -53,8 +49,7 @@ function Reservation() {
     setPhone("");
     setTableNumber("");
     setNote("");
-
-    setSuccess("Rezervasiyanız qəbul olundu.");
+    setSuccess("Rezervasiyanız qəbul olundu. /myorders bölməsində görə bilərsiniz.");
   }
 
   return (
@@ -74,20 +69,13 @@ function Reservation() {
             Reserve your place now and enjoy your special moments with us.
           </p>
 
-          {/* CLICK EDILEN CARDLAR */}
           <div className="infoCards">
-            <div
-              className="card"
-              onClick={() => navigate("/reservation/1")}
-            >
+            <div className="card">
               <h3>Opening Hours</h3>
               <p>08:00 AM - 11:00 PM</p>
             </div>
 
-            <div
-              className="card"
-              onClick={() => navigate("/reservation/2")}
-            >
+            <div className="card">
               <h3>Location</h3>
               <p>Baku, Azerbaijan</p>
             </div>
@@ -98,9 +86,7 @@ function Reservation() {
           <form className="reservationForm" onSubmit={onSubmit}>
             <h2>Make Reservation</h2>
 
-            {success ? (
-              <div className="reservationNotice">{success}</div>
-            ) : null}
+            {success ? <div className="reservationNotice">{success}</div> : null}
 
             <input
               type="text"
@@ -157,8 +143,7 @@ function Reservation() {
                 value={tableNumber}
                 onChange={(e) => setTableNumber(e.target.value)}
               >
-                <option value="">Select table</option>
-
+                <option value="">Select table (optional)</option>
                 {availableTables.map((t) => (
                   <option key={t.number} value={t.number}>
                     Table #{t.number}
@@ -166,7 +151,12 @@ function Reservation() {
                 ))}
               </select>
 
-              <input type="text" value="Baku" readOnly />
+              <input
+                type="text"
+                placeholder="Location (optional)"
+                value="Baku"
+                readOnly
+              />
             </div>
 
             <textarea
