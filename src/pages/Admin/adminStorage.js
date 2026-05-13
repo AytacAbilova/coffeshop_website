@@ -3,6 +3,9 @@ const STORAGE_KEYS = {
   menu: "admin_menu_items",
   staff: "admin_staff",
   tables: "admin_tables",
+  cart: "shop_cart",
+  orders: "shop_orders",
+  reservations: "shop_reservations",
 };
 
 function safeParseJson(value, fallback) {
@@ -162,4 +165,61 @@ export function newStaffMember() {
     phone: "",
     active: true,
   };
+}
+
+export function getCart() {
+  const data = loadJson(STORAGE_KEYS.cart, null);
+  if (Array.isArray(data)) return data;
+  saveJson(STORAGE_KEYS.cart, []);
+  return [];
+}
+
+export function saveCart(cart) {
+  saveJson(STORAGE_KEYS.cart, cart);
+}
+
+export function getOrders() {
+  const data = loadJson(STORAGE_KEYS.orders, null);
+  if (Array.isArray(data)) return data;
+  saveJson(STORAGE_KEYS.orders, []);
+  return [];
+}
+
+export function saveOrders(orders) {
+  saveJson(STORAGE_KEYS.orders, orders);
+}
+
+export function createOrder(orderInput) {
+  const next = {
+    id: createId(),
+    createdAt: new Date().toISOString(),
+    status: "new",
+    ...orderInput,
+  };
+  const orders = getOrders();
+  saveOrders([next, ...orders]);
+  return next;
+}
+
+export function getReservations() {
+  const data = loadJson(STORAGE_KEYS.reservations, null);
+  if (Array.isArray(data)) return data;
+  saveJson(STORAGE_KEYS.reservations, []);
+  return [];
+}
+
+export function saveReservations(reservations) {
+  saveJson(STORAGE_KEYS.reservations, reservations);
+}
+
+export function createReservation(reservationInput) {
+  const next = {
+    id: createId(),
+    createdAt: new Date().toISOString(),
+    status: "pending",
+    ...reservationInput,
+  };
+  const reservations = getReservations();
+  saveReservations([next, ...reservations]);
+  return next;
 }
