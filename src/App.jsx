@@ -8,7 +8,6 @@ import "./index.css";
 
 import Home from "./pages/Home/Home";
 import Reservation from "./pages/Reservation/Reservation";
-import CardDetail from "./pages/Detail/Detail";
 import Layout from "./components/layout/Layout";
 import Menu from "./pages/Menu/Menu";
 import MyOrders from "./pages/My orders/MyOrders";
@@ -28,8 +27,7 @@ import {
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
-import Contact from "./Pages/Contact/Contact";
-
+import Wishlist from "./pages/Wishlist/Wishlist";
 
 const requireAdminLoader = () => {
   if (!isAdminAuthed()) return redirect("/admin/login");
@@ -55,9 +53,7 @@ const router = createBrowserRouter([
       { path: "/reservation", element: <Reservation /> },
       { path: "/menu", element: <Menu /> },
       { path: "/myorders", element: <MyOrders /> },
-      { path: "/contact", element: <Contact /> }
-
-
+      { path: "/wishlist", element: <Wishlist /> },
     ],
   },
 
