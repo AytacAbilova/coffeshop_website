@@ -223,3 +223,40 @@ export function createReservation(reservationInput) {
   saveReservations([next, ...reservations]);
   return next;
 }
+
+
+
+
+// ─── adminStorage.js-ə əlavə et ───────────────────────────────────────────────
+
+const WISHLIST_KEY = "wishlist";
+
+export function getWishlist() {
+  try {
+    return JSON.parse(localStorage.getItem(WISHLIST_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function addToWishlist(item) {
+  const list = getWishlist();
+  const exists = list.some((i) => i.id === item.id);
+  if (exists) return false; // artıq var
+  list.push({ ...item, addedAt: new Date().toISOString() });
+  localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+  return true;
+}
+
+export function removeFromWishlist(id) {
+  const list = getWishlist().filter((i) => i.id !== id);
+  localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+}
+
+export function clearWishlist() {
+  localStorage.removeItem(WISHLIST_KEY);
+}
+
+export function isInWishlist(id) {
+  return getWishlist().some((i) => i.id === id);
+}

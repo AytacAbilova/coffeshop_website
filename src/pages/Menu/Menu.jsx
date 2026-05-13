@@ -1,13 +1,39 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import { createOrder, getCart, getMenuItems, saveCart } from "../Admin/adminStorage";
 import "./Menu.css";
+=======
+import {
+  createOrder,
+  getCart,
+  getMenuItems,
+  saveCart,
+} from "../Admin/adminStorage";
+>>>>>>> dev
 
-export default function CafeMenu() {
+import {
+  addToWishlist,
+  removeFromWishlist,
+  isInWishlist,
+  getWishlist,
+} from "../Admin/adminStorage";
+
+import "./Menu.css";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { toast } from "react-toastify";
+
+
+export default function Menu() {
   const navigate = useNavigate();
   const menuItems = useMemo(() => getMenuItems(), []);
+
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState(() => getCart());
+  const [wishlist, setWishlist] = useState(() => getWishlist());
+
+  
+  
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [note, setNote] = useState("");
@@ -32,6 +58,7 @@ export default function CafeMenu() {
     saveCart(next);
   }
 
+  // ---------------- CART ----------------
   function addToCart(item) {
     const id = item.id;
     const next = [...cart];
@@ -40,6 +67,8 @@ export default function CafeMenu() {
       const qty = (Number(next[idx].qty) || 0) + 1;
       next[idx] = { ...next[idx], qty };
       persist(next);
+
+      toast.success("Səbətə əlavə olundu");
       return;
     }
     persist([
@@ -52,6 +81,8 @@ export default function CafeMenu() {
       },
       ...next,
     ]);
+
+    toast.success("Səbətə əlavə olundu");
   }
 
   function decQty(id) {
@@ -72,12 +103,34 @@ export default function CafeMenu() {
 
   function removeItem(id) {
     persist(cart.filter((it) => it.id !== id));
+    toast.error("Səbətdən silindi");
   }
 
   function clearAll() {
     persist([]);
   }
 
+  // ---------------- WISHLIST ----------------
+  function toggleWishlist(item) {
+    if (isInWishlist(item.id)) {
+      removeFromWishlist(item.id);
+      toast.error("Wishlist-dən silindi");
+    } else {
+      addToWishlist({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.imageUrl,
+        category: item.category,
+      });
+
+      toast.success("Wishlist-ə əlavə olundu");
+    }
+
+    setWishlist(getWishlist());
+  }
+
+  // ---------------- ORDER ----------------
   function placeOrder(e) {
     e.preventDefault();
     setMessage("");
@@ -101,6 +154,10 @@ export default function CafeMenu() {
     setCustomerPhone("");
     setNote("");
     setMessage("Sifarişiniz qəbul olundu. Tarixçəni yoxlayın.");
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
     navigate("/myorders");
   }
 
@@ -114,16 +171,23 @@ export default function CafeMenu() {
           </div>
 
           <button
-            type="button"
             className="menu__cartBtn"
             onClick={() => setCartOpen(true)}
           >
             Səbət
-            <span className="menu__cartBadge">{cartCount}</span>
+            {cartCount > 0 && (
+              <span className="menu__cartBadge">
+                {cartCount}
+              </span>
+            )}
           </button>
         </div>
 
+<<<<<<< HEAD
         {message ? <div className="menu__message">{message}</div> : null}
+=======
+        {message && <div className="menu__message">{message}</div>}
+>>>>>>> dev
 
         <div className="menu-grid">
           {menuItems.map((item) => (
@@ -134,6 +198,18 @@ export default function CafeMenu() {
                 ) : (
                   <div className="menu-card__imgFallback" />
                 )}
+
+                {/* WISHLIST */}
+                <button
+                  className="menu-card__heart"
+                  onClick={() => toggleWishlist(item)}
+                >
+                  {isInWishlist(item.id) ? (
+                    <FaHeart color="red" />
+                  ) : (
+                    <FaRegHeart />
+                  )}
+                </button>
               </div>
               <div className="menu-card__body">
                 <div className="menu-card__row">
@@ -147,7 +223,6 @@ export default function CafeMenu() {
                     {item.category === "food" ? "Yemək" : "İçki"}
                   </span>
                   <button
-                    type="button"
                     className="menu-card__add"
                     onClick={() => addToCart(item)}
                   >
@@ -171,6 +246,7 @@ export default function CafeMenu() {
             </div>
 
             {cart.length === 0 ? (
+<<<<<<< HEAD
               <p className="cartDrawer__empty">Səbət boşdur.</p>
             ) : (
               <>
@@ -246,6 +322,55 @@ export default function CafeMenu() {
                   <button className="checkout__btn" type="submit">
                     Sifarişi göndər
                   </button>
+=======
+              <p>Səbət boşdur</p>
+            ) : (
+              <>
+                {cart.map((it) => (
+                  <div key={it.id}>
+                    <p>{it.name}</p>
+
+                    <button onClick={() => decQty(it.id)}>
+                      -
+                    </button>
+
+                    {it.qty}
+
+                    <button onClick={() => incQty(it.id)}>
+                      +
+                    </button>
+
+                    <button
+                      onClick={() => removeItem(it.id)}
+                    >
+                      Sil
+                    </button>
+                  </div>
+                ))}
+
+                <h3>₼{total.toFixed(2)}</h3>
+
+                <form onSubmit={placeOrder}>
+                  <input
+                    placeholder="Ad"
+                    value={customerName}
+                    onChange={(e) =>
+                      setCustomerName(e.target.value)
+                    }
+                    required
+                  />
+
+                  <input
+                    placeholder="Telefon"
+                    value={customerPhone}
+                    onChange={(e) =>
+                      setCustomerPhone(e.target.value)
+                    }
+                    required
+                  />
+
+                  <button>Sifariş et</button>
+>>>>>>> dev
                 </form>
               </>
             )}
