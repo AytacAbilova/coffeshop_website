@@ -28,6 +28,8 @@ import {
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
+import Contact from "./Pages/Contact/Contact";
+
 
 const requireAdminLoader = () => {
   if (!isAdminAuthed()) return redirect("/admin/login");
@@ -49,17 +51,13 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { index: true, element: <Home /> },
+      { path: "/", element: <Home /> },
+      { path: "/reservation", element: <Reservation /> },
+      { path: "/menu", element: <Menu /> },
+      { path: "/myorders", element: <MyOrders /> },
+      { path: "/contact", element: <Contact /> }
 
-      // RESERVATION DETAIL
-      { path: "reservation", element: <Reservation /> },
-      { path: "reservation/:type", element: <CardDetail /> },
 
-      // MENU DETAIL (❗ BUNU ƏLAVƏ ETDİM)
-      { path: "menu/:id", element: <CardDetail /> },
-
-      { path: "menu", element: <Menu /> },
-      { path: "myorders", element: <MyOrders /> },
     ],
   },
 
