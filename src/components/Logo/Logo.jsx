@@ -1,9 +1,12 @@
+import { Link } from "react-router-dom";
 import logoImg from "../../assets/img/logo.avif";
 
 const Logo = () => {
   return (
     <div>
-      <img src={logoImg} alt="" />
+      <Link to='/'>
+        <img src={logoImg} alt="" />
+      </Link>
     </div>
   );
 };
