@@ -1,9 +1,10 @@
-import Navlist from "../navlist/Navlist";
+import Navbar from "../Navbar/Navbar";
+import "./Header.css";
 
 const Header = () => {
   return (
-    <div>
-      <Navlist />
+    <div id="header">
+      <Navbar />
     </div>
   );
 };
