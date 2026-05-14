@@ -7,49 +7,129 @@ const styles = {
     minHeight: "100vh",
     display: "grid",
     placeItems: "center",
-    background: "linear-gradient(180deg, #f7f8fc 0%, #f2f4fa 100%)",
-    color: "#0f172a",
+    background: "linear-gradient(160deg, #1a0f08 0%, #2c1a0e 50%, #1a0f08 100%)",
+    color: "#f5e6d0",
     padding: "20px",
+    fontFamily: "'Georgia', 'Times New Roman', serif",
+    position: "relative",
+    overflow: "hidden",
+  },
+  bgPattern: {
+    position: "absolute",
+    inset: 0,
+    backgroundImage: `radial-gradient(circle at 20% 20%, rgba(193,134,65,0.08) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(193,134,65,0.06) 0%, transparent 50%)`,
+    pointerEvents: "none",
   },
   card: {
     width: "min(420px, 100%)",
-    background: "#ffffff",
-    border: "1px solid #e5e7eb",
-    borderRadius: "18px",
-    padding: "18px",
-    boxShadow: "0 16px 40px rgba(17, 24, 39, 0.10)",
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(193,134,65,0.25)",
+    borderRadius: "4px",
+    padding: "36px 32px",
+    backdropFilter: "blur(12px)",
+    boxShadow: "0 24px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(193,134,65,0.1)",
+    position: "relative",
   },
-  title: { margin: 0, fontSize: "18px", fontWeight: 900 },
-  sub: { margin: "6px 0 0", color: "#6b7280", fontSize: "13px" },
-  form: { marginTop: "14px", display: "grid", gap: "10px" },
-  label: { display: "grid", gap: "6px", fontSize: "13px", color: "#374151" },
+  ornament: {
+    textAlign: "center",
+    color: "#c18641",
+    fontSize: "22px",
+    letterSpacing: "8px",
+    marginBottom: "16px",
+    opacity: 0.7,
+  },
+  title: {
+    margin: 0,
+    fontSize: "26px",
+    fontWeight: "normal",
+    letterSpacing: "2px",
+    color: "#f5e6d0",
+    textAlign: "center",
+    textTransform: "uppercase",
+  },
+  sub: {
+    margin: "8px 0 0",
+    color: "#a07850",
+    fontSize: "12px",
+    letterSpacing: "3px",
+    textTransform: "uppercase",
+    textAlign: "center",
+    fontFamily: "'Georgia', serif",
+  },
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    margin: "24px 0 20px",
+  },
+  dividerLine: {
+    flex: 1,
+    height: "1px",
+    background: "linear-gradient(90deg, transparent, rgba(193,134,65,0.4), transparent)",
+  },
+  dividerDot: {
+    width: "4px",
+    height: "4px",
+    borderRadius: "999px",
+    background: "#c18641",
+    opacity: 0.6,
+  },
+  form: { display: "grid", gap: "14px" },
+  label: {
+    display: "grid",
+    gap: "6px",
+    fontSize: "10px",
+    color: "#a07850",
+    letterSpacing: "2px",
+    textTransform: "uppercase",
+    fontFamily: "'Georgia', serif",
+  },
   input: {
-    padding: "10px 12px",
-    borderRadius: "12px",
-    border: "1px solid #e5e7eb",
-    background: "#ffffff",
-    color: "#0f172a",
+    padding: "12px 14px",
+    borderRadius: "2px",
+    border: "1px solid rgba(193,134,65,0.2)",
+    background: "rgba(255,255,255,0.04)",
+    color: "#f5e6d0",
     outline: "none",
+    fontSize: "14px",
+    fontFamily: "'Georgia', serif",
+    transition: "border-color 0.2s",
   },
   button: {
-    padding: "10px 12px",
-    borderRadius: "12px",
-    border: "1px solid rgba(79, 70, 229, 0.35)",
-    background: "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)",
-    color: "#ffffff",
+    marginTop: "6px",
+    padding: "13px 12px",
+    borderRadius: "2px",
+    border: "1px solid rgba(193,134,65,0.5)",
+    background: "linear-gradient(135deg, #c18641 0%, #a06c2a 100%)",
+    color: "#1a0f08",
     cursor: "pointer",
-    fontWeight: 900,
-    boxShadow: "0 12px 24px rgba(79, 70, 229, 0.18)",
+    fontWeight: "bold",
+    fontSize: "11px",
+    letterSpacing: "3px",
+    textTransform: "uppercase",
+    fontFamily: "'Georgia', serif",
+    boxShadow: "0 4px 16px rgba(193,134,65,0.3)",
+    transition: "opacity 0.2s",
   },
   error: {
-    padding: "10px 12px",
-    borderRadius: "12px",
-    border: "1px solid rgba(239, 68, 68, 0.35)",
-    background: "rgba(239, 68, 68, 0.08)",
-    color: "#991b1b",
-    fontSize: "13px",
+    padding: "10px 14px",
+    borderRadius: "2px",
+    border: "1px solid rgba(220, 80, 60, 0.4)",
+    background: "rgba(220, 80, 60, 0.08)",
+    color: "#e07060",
+    fontSize: "12px",
+    letterSpacing: "0.5px",
+    fontFamily: "'Georgia', serif",
   },
-  hint: { margin: "12px 0 0", color: "#6b7280", fontSize: "12px" },
+  hint: {
+    margin: "20px 0 0",
+    color: "#5a3e28",
+    fontSize: "11px",
+    letterSpacing: "1px",
+    textAlign: "center",
+    fontFamily: "'Georgia', serif",
+  },
 };
 
 export default function AdminLogin() {
@@ -66,28 +146,34 @@ export default function AdminLogin() {
   function onSubmit(e) {
     e.preventDefault();
     setError("");
-
     if (
       username.trim() !== validCredentials.username ||
       password !== validCredentials.password
     ) {
-      setError("Login düzgün deyil.");
+      setError("Login məlumatları düzgün deyil.");
       return;
     }
-
     setAdminAuthed();
     navigate("/admin", { replace: true });
   }
 
   return (
     <div style={styles.page}>
+      <div style={styles.bgPattern} />
       <div style={styles.card}>
-        <h1 style={styles.title}>Admin Login</h1>
-        <p style={styles.sub}>Admin panelə giriş edin.</p>
+        <div style={styles.ornament}>☕</div>
+        <h1 style={styles.title}>Admin</h1>
+        <p style={styles.sub}>Café Management</p>
+
+        <div style={styles.divider}>
+          <div style={styles.dividerLine} />
+          <div style={styles.dividerDot} />
+          <div style={styles.dividerLine} />
+        </div>
 
         <form style={styles.form} onSubmit={onSubmit}>
           <label style={styles.label}>
-            Username
+            İstifadəçi adı
             <input
               style={styles.input}
               value={username}
@@ -98,7 +184,7 @@ export default function AdminLogin() {
           </label>
 
           <label style={styles.label}>
-            Password
+            Şifrə
             <input
               style={styles.input}
               value={password}
@@ -116,9 +202,8 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <p style={styles.hint}>Default: admin / admin123</p>
+        <p style={styles.hint}>admin / admin123</p>
       </div>
     </div>
   );
 }
-

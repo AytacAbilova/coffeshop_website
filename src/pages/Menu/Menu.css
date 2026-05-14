@@ -148,8 +148,8 @@
   font-size: 12px;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .menu-card__add {
@@ -222,8 +222,8 @@
 .cartDrawer input {
   padding: 10px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
 }
 
@@ -234,4 +234,117 @@
   border-radius: 999px;
   font-weight: 900;
   cursor: pointer;
+}
+
+/* ───────── CLOSE BUTTON ───────── */
+.cartDrawer__close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 600;
+}
+
+.cartDrawer__close:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ───────── QTY BUTTONS (+ / -) ───────── */
+.qtyBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: #d8a25e;
+  color: #1a0a00;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.qtyBtn:hover {
+  transform: scale(1.1);
+  filter: brightness(1.05);
+}
+
+/* ───────── REMOVE BUTTON (SIL) ───────── */
+.cartItem__remove {
+  background: transparent;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  color: #ff6b6b;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.cartItem__remove:hover {
+  background: rgba(255, 107, 107, 0.12);
+}
+
+/* ───────── CLEAR CART BUTTON ───────── */
+.cartSummary__clear {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.cartSummary__clear:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+/* ───────── ORDER BUTTON ───────── */
+.checkout__btn {
+  background: #d8a25e;
+  color: #1a0a00;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.checkout__btn:hover {
+  transform: scale(1.03);
+  filter: brightness(1.05);
+}
+
+.cartItem__body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+}
+
+.cartItem__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 70px;
+}
+
+.cartItem__qty {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.cartSummary__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 90px;
+  font-size: 22px;
+  font-weight: 800;
 }

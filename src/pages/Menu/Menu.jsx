@@ -5,11 +5,16 @@ import {
   getCart,
   getMenuItems,
   saveCart,
+} from "../Admin/adminStorage";
+import "./Menu.css";
+
+import {
   addToWishlist,
   removeFromWishlist,
   isInWishlist,
   getWishlist,
 } from "../Admin/adminStorage";
+
 import "./Menu.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -21,6 +26,7 @@ export default function Menu() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState(() => getCart());
   const [wishlist, setWishlist] = useState(() => getWishlist());
+
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [note, setNote] = useState("");
@@ -28,16 +34,16 @@ export default function Menu() {
 
   const cartCount = useMemo(
     () => cart.reduce((sum, it) => sum + (Number(it.qty) || 0), 0),
-    [cart]
+    [cart],
   );
 
   const total = useMemo(
     () =>
       cart.reduce(
         (sum, it) => sum + (Number(it.qty) || 0) * (Number(it.price) || 0),
-        0
+        0,
       ),
-    [cart]
+    [cart],
   );
 
   function persist(next) {
@@ -54,6 +60,7 @@ export default function Menu() {
       const qty = (Number(next[idx].qty) || 0) + 1;
       next[idx] = { ...next[idx], qty };
       persist(next);
+
       toast.success("Səbətə əlavə olundu");
       return;
     }
@@ -67,13 +74,14 @@ export default function Menu() {
       },
       ...next,
     ]);
+
     toast.success("Səbətə əlavə olundu");
   }
 
   function decQty(id) {
     const next = cart
       .map((it) =>
-        it.id === id ? { ...it, qty: (Number(it.qty) || 0) - 1 } : it
+        it.id === id ? { ...it, qty: (Number(it.qty) || 0) - 1 } : it,
       )
       .filter((it) => (Number(it.qty) || 0) > 0);
     persist(next);
@@ -81,7 +89,7 @@ export default function Menu() {
 
   function incQty(id) {
     const next = cart.map((it) =>
-      it.id === id ? { ...it, qty: (Number(it.qty) || 0) + 1 } : it
+      it.id === id ? { ...it, qty: (Number(it.qty) || 0) + 1 } : it,
     );
     persist(next);
   }
@@ -108,8 +116,10 @@ export default function Menu() {
         image: item.imageUrl,
         category: item.category,
       });
+
       toast.success("Wishlist-ə əlavə olundu");
     }
+
     setWishlist(getWishlist());
   }
 
@@ -157,11 +167,15 @@ export default function Menu() {
           </button>
         </div>
 
-        {message && <div className="menu__message">{message}</div>}
+        {message ? <div className="menu__message">{message}</div> : null}
 
         <div className="menu-grid">
           {menuItems.map((item) => (
-            <div key={item.id} className="menu-card">
+            <div
+              key={item.id}
+              className="menu-card"
+              onClick={() => navigate(`/menu/${item.id}`)}
+            >
               <div className="menu-card__imgWrap">
                 {item.imageUrl ? (
                   <img
@@ -173,9 +187,13 @@ export default function Menu() {
                   <div className="menu-card__imgFallback" />
                 )}
 
+                {/* WISHLIST */}
                 <button
                   className="menu-card__heart"
-                  onClick={() => toggleWishlist(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleWishlist(item);
+                  }}
                 >
                   {isInWishlist(item.id) ? (
                     <FaHeart color="red" />
@@ -197,7 +215,10 @@ export default function Menu() {
                   </span>
                   <button
                     className="menu-card__add"
-                    onClick={() => addToCart(item)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(item);
+                    }}
                   >
                     Səbətə at
                   </button>
@@ -208,7 +229,7 @@ export default function Menu() {
         </div>
       </div>
 
-      {cartOpen && (
+      {cartOpen ? (
         <div
           className="cartOverlay"
           role="presentation"
@@ -333,7 +354,7 @@ export default function Menu() {
             )}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
