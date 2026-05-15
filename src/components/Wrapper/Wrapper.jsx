@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { FaHeart, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { clearAuthTokens, getCurrentUser, getAccessToken } from "../../pages/Admin/adminStorage";
+import {
+  clearAuthTokens,
+  getCurrentUser,
+  getAccessToken,
+  clearWishlist,
+  saveCart,
+} from "../../pages/Admin/adminStorage";
 import "./Wrapper.css";
 
 const Wrapper = () => {
@@ -12,16 +18,18 @@ const Wrapper = () => {
 
   const isLoggedIn = Boolean(token);
 
-  function logout() {
-    try {
-      localStorage.removeItem("user");
-    } catch {
-      return;
-    }
-    clearAuthTokens();
-    setOpen(false);
-    navigate("/login");
-  }
+function logout() {
+  // Əvvəlcə user hələ localStorage-dadır — düzgün açarı tapır
+  clearWishlist();
+  saveCart([]);
+  // İndi user-i sil
+  try {
+    localStorage.removeItem("user");
+  } catch {}
+  clearAuthTokens();
+  setOpen(false);
+  navigate("/login");
+}
 
   return (
     <div className="wrapper">
@@ -45,7 +53,11 @@ const Wrapper = () => {
                 <p className="profileEmail">{user?.email || "-"}</p>
               </div>
 
-              <Link className="profileLink" to="/myorders" onClick={() => setOpen(false)}>
+              <Link
+                className="profileLink"
+                to="/myorders"
+                onClick={() => setOpen(false)}
+              >
                 Profil
               </Link>
 
