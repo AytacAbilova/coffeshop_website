@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import {
-  createOrder,
   getCart,
   saveCart,
   addToWishlist,
   removeFromWishlist,
   isInWishlist,
+  apiCreateOrder,
+  getCurrentUserId,
 } from "../Admin/adminStorage";
 
 import "./Menu.css";
@@ -26,6 +27,7 @@ export default function Menu() {
 
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [tableId, setTableId] = useState("");
   const [note, setNote] = useState("");
   const [message, setMessage] = useState("");
 
@@ -150,7 +152,7 @@ export default function Menu() {
   }
 
   // ORDER
-  function placeOrder(e) {
+  async function placeOrder(e) {
     e.preventDefault();
 
     setMessage("");
@@ -162,28 +164,51 @@ export default function Menu() {
 
     if (!name || !phone) return;
 
-    createOrder({
-      customer: {
-        name,
-        phone,
-      },
-      note: note.trim(),
-      items: cart,
-      total,
-      currency: "AZN",
-    });
+    const customerId = getCurrentUserId();
+    if (!customerId) {
+      toast.error("Sifariş vermək üçün əvvəlcə login olun.");
+      navigate("/login");
+      return;
+    }
 
-    clearAll();
+    const apiItems = cart.map((it) => ({
+      menuItemId: Number(it.id),
+      quantity: Number(it.qty) || 0,
+    }));
 
-    setCartOpen(false);
+    if (apiItems.some((it) => !Number.isFinite(it.menuItemId) || it.menuItemId <= 0)) {
+      toast.error("Səbətdə ID problemi var (menu item ID). Menyu API-dən yüklənsin.");
+      return;
+    }
 
-    setCustomerName("");
-    setCustomerPhone("");
-    setNote("");
+    try {
+      const res = await apiCreateOrder({
+        customerId,
+        tableId: Number(tableId) || 0,
+        items: apiItems,
+      });
 
-    setMessage("Sifarişiniz qəbul olundu.");
+      if (!res.ok) {
+        toast.error("Sifariş göndərilmədi.");
+        return;
+      }
 
-    navigate("/myorders");
+      clearAll();
+
+      setCartOpen(false);
+
+      setCustomerName("");
+      setCustomerPhone("");
+      setTableId("");
+      setNote("");
+
+      setMessage("Sifarişiniz qəbul olundu.");
+
+      navigate("/myorders");
+    } catch (error) {
+      console.log(error);
+      toast.error("Xəta baş verdi");
+    }
   }
 
   return (
@@ -399,6 +424,14 @@ export default function Menu() {
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     required
+                  />
+                  <input
+                    className="checkout__input"
+                    type="number"
+                    min={0}
+                    placeholder="Masa ID (istəyə bağlı)"
+                    value={tableId}
+                    onChange={(e) => setTableId(e.target.value)}
                   />
                   <textarea
                     className="checkout__input checkout__textarea"

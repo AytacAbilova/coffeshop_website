@@ -19,10 +19,12 @@ import AdminMenu from "./pages/Admin/AdminMenu";
 import AdminStaff from "./pages/Admin/AdminStaff";
 import AdminTables from "./pages/Admin/AdminTables";
 import {
+  apiGetOrdersByCustomer,
   clearAdminAuth,
   clearAuthTokens,
   ensureValidAccessToken,
   getAccessToken,
+  getCurrentUserId,
   isAccessTokenExpired,
   isAdminAuthed,
 } from "./pages/Admin/adminStorage";
@@ -150,6 +152,18 @@ const adminTablesLoader = async () => {
   }
 };
 
+const myOrdersLoader = async () => {
+  const customerId = getCurrentUserId();
+  if (!customerId) return [];
+  try {
+    const res = await apiGetOrdersByCustomer(customerId);
+    if (!res.ok) return [];
+    return Array.isArray(res.data) ? res.data : [];
+  } catch {
+    return [];
+  }
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -159,7 +173,7 @@ const router = createBrowserRouter([
       { path: "/reservation", element: <Reservation /> },
       { path: "/menu/:id", element: <Detail /> },
       { path: "/menu", element: <Menu /> },
-      { path: "/myorders", element: <MyOrders /> },
+      { path: "/myorders", loader: myOrdersLoader, element: <MyOrders /> },
       { path: "/wishlist", element: <Wishlist /> },
       { path: "/contact", element: <Contact /> },
     ],

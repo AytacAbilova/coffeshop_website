@@ -193,6 +193,95 @@ export async function ensureValidAccessToken() {
   return await refreshAccessToken();
 }
 
+export function getCurrentUser() {
+  try {
+    const raw = localStorage.getItem("user");
+    if (!raw) return null;
+    return safeParseJson(raw, null);
+  } catch {
+    return null;
+  }
+}
+
+export function getCurrentUserId() {
+  const user = getCurrentUser();
+  const id = user?.userId ?? user?.id ?? user?.customerId;
+  const n = Number(id);
+  return Number.isFinite(n) ? n : null;
+}
+
+async function authorizedJsonFetch(path, options = {}) {
+  const token = await ensureValidAccessToken();
+  if (!token) return { ok: false, status: 401, data: null };
+
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) return { ok: false, status: res.status, data: null };
+
+  try {
+    const data = await res.json();
+    return { ok: true, status: res.status, data };
+  } catch {
+    return { ok: true, status: res.status, data: null };
+  }
+}
+
+export async function apiCreateOrder({ customerId, tableId, items }) {
+  const cid = Number(customerId);
+  if (!Number.isFinite(cid) || cid <= 0) {
+    return { ok: false, status: 400, data: null };
+  }
+
+  const payload = {
+    tableId: Number(tableId) || 0,
+    items: Array.isArray(items) ? items : [],
+  };
+
+  return await authorizedJsonFetch(`/api/Orders?customerId=${cid}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiGetOrderById(id) {
+  const raw = typeof id === "string" ? id.trim() : String(id ?? "");
+  if (!raw) return { ok: false, status: 400, data: null };
+  const asNumber = Number(raw);
+  const pathId = Number.isFinite(asNumber) ? String(asNumber) : encodeURIComponent(raw);
+  return await authorizedJsonFetch(`/api/Orders/${pathId}`);
+}
+
+export async function apiDeleteOrder(id) {
+  const raw = typeof id === "string" ? id.trim() : String(id ?? "");
+  if (!raw) return { ok: false, status: 400, data: null };
+  const asNumber = Number(raw);
+  const pathId = Number.isFinite(asNumber) ? String(asNumber) : encodeURIComponent(raw);
+  return await authorizedJsonFetch(`/api/Orders/${pathId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function apiGetOrdersByCustomer(customerId) {
+  const cid = Number(customerId);
+  if (!Number.isFinite(cid) || cid <= 0) {
+    return { ok: false, status: 400, data: null };
+  }
+
+  return await authorizedJsonFetch(`/api/Orders/${cid}`);
+}
+
+
+export async function apiGetOrdersByTable(tableId) {
+  return await authorizedJsonFetch(`/api/Orders?tableId=${Number(tableId)}`);
+}
+
 export function getMenuItems() {
   const data = loadJson(STORAGE_KEYS.menu, null);
   if (Array.isArray(data)) return data;
