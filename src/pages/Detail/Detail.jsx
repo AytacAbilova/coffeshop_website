@@ -1,25 +1,52 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useMemo } from "react";
-import { getMenuItems, getCart, saveCart } from "../Admin/adminStorage";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { getCart, saveCart, addToWishlist, removeFromWishlist, isInWishlist } from "../Admin/adminStorage";
 import "./Detail.css";
+
+const API_URL = "https://simulation2-production-7983.up.railway.app/api/MenuItems";
 
 function Detail() {
   const { type, id } = useParams();
   const navigate = useNavigate();
-  const menuItems = useMemo(() => getMenuItems(), []);
 
-  function addToCart(item) {
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const [wished, setWished] = useState(false);
+
+  useEffect(() => {
+    if (id === undefined) return;
+    setLoading(true);
+    axios
+      .get(`${API_URL}/${id}`)
+      .then((res) => {
+        setItem(res.data);
+        setWished(isInWishlist(res.data.id));
+      })
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  function addToCart(menuItem) {
     const cart = getCart();
-    const idx = cart.findIndex((c) => c.id === item.id);
+    const idx = cart.findIndex((c) => String(c.id) === String(menuItem.id));
     let next;
     if (idx >= 0) {
       next = cart.map((c) =>
-        c.id === item.id ? { ...c, qty: (Number(c.qty) || 0) + 1 } : c
+        String(c.id) === String(menuItem.id)
+          ? { ...c, qty: (Number(c.qty) || 0) + 1 }
+          : c
       );
     } else {
       next = [
-        { id: item.id, name: item.name, price: Number(item.price) || 0,
-          imageUrl: item.imageUrl || "", qty: 1 },
+        {
+          id: menuItem.id,
+          name: menuItem.name,
+          price: Number(menuItem.price) || 0,
+          imageUrl: menuItem.imageUrl || "",
+          qty: 1,
+        },
         ...cart,
       ];
     }
@@ -27,11 +54,33 @@ function Detail() {
     navigate("/menu");
   }
 
+  function toggleWishlist(menuItem) {
+    if (isInWishlist(menuItem.id)) {
+      removeFromWishlist(menuItem.id);
+      setWished(false);
+    } else {
+      addToWishlist({
+        id: menuItem.id,
+        name: menuItem.name,
+        price: menuItem.price,
+        image: menuItem.imageUrl || "",
+      });
+      setWished(true);
+    }
+  }
+
   /* ── Menu detail ── */
   if (id !== undefined) {
-    const item = menuItems.find((m) => String(m.id) === String(id));
+    if (loading) {
+      return (
+        <div className="detailPage">
+          <button onClick={() => navigate(-1)}>← Geri</button>
+          <p style={{ marginTop: 24 }}>Yüklənir...</p>
+        </div>
+      );
+    }
 
-    if (!item) {
+    if (notFound || !item) {
       return (
         <div className="detailPage">
           <button onClick={() => navigate(-1)}>← Geri</button>
@@ -40,6 +89,9 @@ function Detail() {
       );
     }
 
+    const categoryLabel =
+      item.description === "food" || item.category === "food" ? "Yemək" : "İçki";
+
     return (
       <div className="detailPage">
         <button onClick={() => navigate(-1)}>← Geri</button>
@@ -47,16 +99,26 @@ function Detail() {
         <div className="detailLayout">
           {/* Left — image */}
           {item.imageUrl ? (
-            <img className="detailLayout__img" src={item.imageUrl} alt={item.name} />
-          ) : (
-            <div className="detailLayout__imgFallback">☕</div>
-          )}
+            <img
+              className="detailLayout__img"
+              src={item.imageUrl}
+              alt={item.name}
+              onError={(e) => {
+                e.target.style.display = "none";
+                e.target.nextSibling && (e.target.nextSibling.style.display = "flex");
+              }}
+            />
+          ) : null}
+          <div
+            className="detailLayout__imgFallback"
+            style={item.imageUrl ? { display: "none" } : {}}
+          >
+            ☕
+          </div>
 
           {/* Right — info */}
           <div className="detailLayout__info">
-            <p className="detailLayout__eyebrow">
-              {item.category === "food" ? "Yemək" : "İçki"}
-            </p>
+            <p className="detailLayout__eyebrow">{categoryLabel}</p>
 
             <h1>{item.name}</h1>
 
@@ -64,20 +126,39 @@ function Detail() {
               ₼{Number(item.price || 0).toFixed(2)}
             </p>
 
-            <span className="detailLayout__chip">
-              {item.category === "food" ? "Yemək" : "İçki"}
-            </span>
+            <span className="detailLayout__chip">{categoryLabel}</span>
 
-            {item.description && (
-              <>
-                <div className="detailLayout__divider" />
-                <p className="detailLayout__desc">{item.description}</p>
-              </>
-            )}
+            <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+              <button
+                className="detailLayout__addBtn"
+                onClick={() => toggleWishlist(item)}
+                style={{
+                  background: wished
+                    ? "rgba(239,68,68,0.1)"
+                    : undefined,
+                  borderColor: wished
+                    ? "rgba(239,68,68,0.4)"
+                    : undefined,
+                  color: wished ? "#991b1b" : undefined,
+                }}
+              >
+                {wished ? "♥ Wishlist-də" : "♡ Wishlist-ə at"}
+              </button>
+            </div>
+
+            {item.description &&
+              item.description !== "food" &&
+              item.description !== "drink" && (
+                <>
+                  <div className="detailLayout__divider" />
+                  <p className="detailLayout__desc">{item.description}</p>
+                </>
+              )}
 
             <button
               className="detailLayout__addBtn"
               onClick={() => addToCart(item)}
+              style={{ marginTop: 12 }}
             >
               + Səbətə at
             </button>
@@ -89,10 +170,17 @@ function Detail() {
 
   /* ── Reservation detail ── */
   const reservationData = {
-    "1": { icon: "🕗", title: "Opening Hours",
-           content: "We are open every day from 08:00 AM to 11:00 PM." },
-    "2": { icon: "📍", title: "Location",
-           content: "We are located in Baku, Azerbaijan. Easy access from city center." },
+    "1": {
+      icon: "🕗",
+      title: "Opening Hours",
+      content: "We are open every day from 08:00 AM to 11:00 PM.",
+    },
+    "2": {
+      icon: "📍",
+      title: "Location",
+      content:
+        "We are located in Baku, Azerbaijan. Easy access from city center.",
+    },
   };
 
   const resItem = reservationData[type];

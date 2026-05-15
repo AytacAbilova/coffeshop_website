@@ -44,7 +44,10 @@ function saveJson(key, value) {
 }
 
 function createId() {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
     return crypto.randomUUID();
   }
   return `${Date.now()}_${Math.random().toString(16).slice(2)}`;
@@ -151,7 +154,10 @@ function decodeJwtPayload(token) {
   const parts = token.split(".");
   if (parts.length < 2) return null;
   const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+  const padded = base64.padEnd(
+    base64.length + ((4 - (base64.length % 4)) % 4),
+    "=",
+  );
   try {
     const json = atob(padded);
     return safeParseJson(json, null);
@@ -270,7 +276,9 @@ export async function apiGetOrderById(id) {
   const raw = typeof id === "string" ? id.trim() : String(id ?? "");
   if (!raw) return { ok: false, status: 400, data: null };
   const asNumber = Number(raw);
-  const pathId = Number.isFinite(asNumber) ? String(asNumber) : encodeURIComponent(raw);
+  const pathId = Number.isFinite(asNumber)
+    ? String(asNumber)
+    : encodeURIComponent(raw);
   return await authorizedJsonFetch(`/api/Orders/${pathId}`);
 }
 
@@ -278,7 +286,9 @@ export async function apiDeleteOrder(id) {
   const raw = typeof id === "string" ? id.trim() : String(id ?? "");
   if (!raw) return { ok: false, status: 400, data: null };
   const asNumber = Number(raw);
-  const pathId = Number.isFinite(asNumber) ? String(asNumber) : encodeURIComponent(raw);
+  const pathId = Number.isFinite(asNumber)
+    ? String(asNumber)
+    : encodeURIComponent(raw);
   return await authorizedJsonFetch(`/api/Orders/${pathId}`, {
     method: "DELETE",
   });
@@ -293,12 +303,15 @@ export async function apiGetOrdersByCustomer(customerId) {
   return await authorizedJsonFetch(`/api/Orders/customer/${cid}`);
 }
 
-
 export async function apiGetOrdersByTable(tableId) {
   return await authorizedJsonFetch(`/api/Orders?tableId=${Number(tableId)}`);
 }
 
-export async function apiCreateReservation({ tableId, startDatetime, endDatetime }) {
+export async function apiCreateReservation({
+  tableId,
+  startDatetime,
+  endDatetime,
+}) {
   const payload = {
     tableId: Number(tableId) || 0,
     startDatetime,
@@ -403,14 +416,14 @@ export function newStaffMember() {
 }
 
 export function getCart() {
-  const data = loadJson(STORAGE_KEYS.cart, null);
+  const data = loadJson(cartKey(), null);
   if (Array.isArray(data)) return data;
-  saveJson(STORAGE_KEYS.cart, []);
+  saveJson(cartKey(), []);
   return [];
 }
 
 export function saveCart(cart) {
-  saveJson(STORAGE_KEYS.cart, cart);
+  saveJson(cartKey(), cart);
 }
 
 export function getOrders() {
@@ -459,16 +472,22 @@ export function createReservation(reservationInput) {
   return next;
 }
 
-
-
-
 // ─── adminStorage.js-ə əlavə et ───────────────────────────────────────────────
 
-const WISHLIST_KEY = "wishlist";
+// User-ə məxsus açarlar
+function wishlistKey() {
+  const user = getCurrentUser();
+  return user?.userId ? `wishlist_${user.userId}` : "wishlist_guest";
+}
+
+function cartKey() {
+  const user = getCurrentUser();
+  return user?.userId ? `shop_cart_${user.userId}` : "shop_cart_guest";
+}
 
 export function getWishlist() {
   try {
-    return JSON.parse(localStorage.getItem(WISHLIST_KEY) || "[]");
+    return JSON.parse(localStorage.getItem(wishlistKey()) || "[]");
   } catch {
     return [];
   }
@@ -476,20 +495,19 @@ export function getWishlist() {
 
 export function addToWishlist(item) {
   const list = getWishlist();
-  const exists = list.some((i) => i.id === item.id);
-  if (exists) return false; // artıq var
+  if (list.some((i) => i.id === item.id)) return false;
   list.push({ ...item, addedAt: new Date().toISOString() });
-  localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+  localStorage.setItem(wishlistKey(), JSON.stringify(list));
   return true;
 }
 
 export function removeFromWishlist(id) {
   const list = getWishlist().filter((i) => i.id !== id);
-  localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+  localStorage.setItem(wishlistKey(), JSON.stringify(list));
 }
 
 export function clearWishlist() {
-  localStorage.removeItem(WISHLIST_KEY);
+  localStorage.removeItem(wishlistKey());
 }
 
 export function isInWishlist(id) {
