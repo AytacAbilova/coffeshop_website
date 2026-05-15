@@ -292,7 +292,7 @@ async function onDelete(id) {
                   <tr key={it.id}>
                     <td style={styles.td}>{it.name}</td>
                     <td style={styles.td}>
-                      <span style={styles.chip}>{it.category === "food" ? "Yemək" : "İçki"}</span>
+                      <span style={styles.chip}>{it.description === "food" ? "Yemək" : "İçki"}</span>
                     </td>
                     <td style={styles.td}>{Number(it.price).toFixed(2)} ₼</td>
                     <td style={styles.td}>
