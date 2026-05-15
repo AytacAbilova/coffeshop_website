@@ -8,6 +8,14 @@ const STORAGE_KEYS = {
   reservations: "shop_reservations",
 };
 
+const API_BASE_URL = "https://simulation2-production-7983.up.railway.app";
+
+const TOKEN_KEYS = {
+  access: "accessToken",
+  refresh: "refreshToken",
+  legacyAccess: "token",
+};
+
 function safeParseJson(value, fallback) {
   if (typeof value !== "string") return fallback;
   try {
@@ -64,7 +72,9 @@ const DEFAULT_STAFF = [
 ];
 
 const DEFAULT_TABLES = Array.from({ length: 10 }, (_, i) => ({
+  id: `t${i + 1}`,
   number: i + 1,
+  capacity: 4,
   status: "available",
 }));
 
@@ -90,6 +100,97 @@ export function clearAdminAuth() {
   } catch {
     return;
   }
+}
+
+export function getAccessToken() {
+  try {
+    return (
+      localStorage.getItem(TOKEN_KEYS.access) ||
+      localStorage.getItem(TOKEN_KEYS.legacyAccess) ||
+      ""
+    );
+  } catch {
+    return "";
+  }
+}
+
+export function getRefreshToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEYS.refresh) || "";
+  } catch {
+    return "";
+  }
+}
+
+export function setAuthTokens({ accessToken, refreshToken }) {
+  try {
+    if (accessToken) {
+      localStorage.setItem(TOKEN_KEYS.access, accessToken);
+      localStorage.setItem(TOKEN_KEYS.legacyAccess, accessToken);
+    }
+    if (refreshToken) {
+      localStorage.setItem(TOKEN_KEYS.refresh, refreshToken);
+    }
+  } catch {
+    return;
+  }
+}
+
+export function clearAuthTokens() {
+  try {
+    localStorage.removeItem(TOKEN_KEYS.access);
+    localStorage.removeItem(TOKEN_KEYS.legacyAccess);
+    localStorage.removeItem(TOKEN_KEYS.refresh);
+  } catch {
+    return;
+  }
+}
+
+function decodeJwtPayload(token) {
+  if (!token || typeof token !== "string") return null;
+  const parts = token.split(".");
+  if (parts.length < 2) return null;
+  const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+  try {
+    const json = atob(padded);
+    return safeParseJson(json, null);
+  } catch {
+    return null;
+  }
+}
+
+export function isAccessTokenExpired(accessToken, skewSeconds = 30) {
+  const payload = decodeJwtPayload(accessToken);
+  const exp = payload?.exp;
+  if (!Number.isFinite(exp)) return false;
+  const now = Math.floor(Date.now() / 1000);
+  return exp <= now + Math.max(0, Math.floor(skewSeconds));
+}
+
+export async function refreshAccessToken() {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return "";
+
+  const res = await fetch(`${API_BASE_URL}/api/Auth/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken }),
+  });
+
+  if (!res.ok) return "";
+  const data = await res.json();
+  const accessToken = data?.accessToken || "";
+  const nextRefresh = data?.refreshToken || refreshToken;
+  if (!accessToken) return "";
+  setAuthTokens({ accessToken, refreshToken: nextRefresh });
+  return accessToken;
+}
+
+export async function ensureValidAccessToken() {
+  const token = getAccessToken();
+  if (token && !isAccessTokenExpired(token)) return token;
+  return await refreshAccessToken();
 }
 
 export function getMenuItems() {

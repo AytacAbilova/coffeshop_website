@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
-import { getMenuItems, newMenuItem, saveMenuItems } from "./adminStorage";
-
+import { newMenuItem } from "./adminStorage";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useEffect } from "react";
 const coffee = {
   gold: "#c18641",
   goldLight: "rgba(193,134,65,0.10)",
@@ -119,6 +121,9 @@ const styles = {
   empty: { color: coffee.muted, margin: "12px 0 0", fontSize: "13px" },
 };
 
+const API_URL =
+  "https://simulation2-production-7983.up.railway.app/api/MenuItems";
+
 function normalizePrice(value) {
   if (value === "") return "";
   const n = Number(value);
@@ -126,43 +131,107 @@ function normalizePrice(value) {
   return n;
 }
 
+
 export default function AdminMenu() {
-  const [items, setItems] = useState(() => getMenuItems());
+  const [items, setItems] = useState([]);
   const [draft, setDraft] = useState(() => newMenuItem());
   const [editingId, setEditingId] = useState(null);
   const isEditing = useMemo(() => Boolean(editingId), [editingId]);
 
-  function persist(next) { setItems(next); saveMenuItems(next); }
   function resetForm() { setDraft(newMenuItem()); setEditingId(null); }
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
     const name = draft.name.trim();
-    const category = draft.category;
+
+    const description = draft.category;
+
     const price = normalizePrice(draft.price);
-    const imageUrl = (draft.imageUrl || "").trim();
-    if (!name) return;
-    if (price === "" || price < 0) return;
-    if (isEditing) {
-      persist(items.map((it) => it.id === editingId ? { ...it, name, category, price, imageUrl } : it));
-      resetForm(); return;
+
+    if (!name) {
+      toast.error("Ad daxil edin");
+      return;
     }
-    persist([{ ...draft, name, category, price, imageUrl }, ...items]);
-    resetForm();
+
+    if (price === "" || price < 0) {
+      toast.error("Qiymət yanlışdır");
+      return;
+    }
+
+    try {
+      if (isEditing) {
+        await axios.put(
+          `${API_URL}/${editingId}`,
+          {
+            id: editingId,
+            name,
+            description,
+            price,
+          }
+        );
+
+        toast.success("Menu yeniləndi");
+      } else {
+        await axios.post(
+          API_URL,
+          {
+            name,
+            description,
+            price,
+          }
+        );
+
+        toast.success("Menu əlavə olundu");
+      }
+
+      await fetchMenu();
+
+      resetForm();
+    } catch (error) {
+      console.log(error.response?.data || error);
+
+      toast.error("Xəta baş verdi");
+    }
   }
 
   function onEdit(item) {
     setEditingId(item.id);
     setDraft({ id: item.id, category: item.category || "drink", name: item.name || "", price: item.price ?? "", imageUrl: item.imageUrl || "" });
   }
+  useEffect(() => {
+    fetchMenu();
+  }, []);
 
-  function onDelete(id) {
-    const ok = window.confirm("Silmək istədiyinizə əminsiniz?");
-    if (!ok) return;
-    persist(items.filter((it) => it.id !== id));
-    if (editingId === id) resetForm();
+  async function fetchMenu() {
+    try {
+      const res = await axios.get(API_URL);
+      setItems(res.data);
+    } catch (error) {
+      console.log(error);
+    }
   }
+async function onDelete(id) {
+  const ok = window.confirm("Silmək istədiyinizə əminsiniz?");
+  if (!ok) return;
 
+  console.log("DELETE ID:", id);
+
+  try {
+    await axios.delete(`${API_URL}/${id}`);
+
+    toast.success("Menu silindi");
+
+    await fetchMenu();
+
+    if (editingId === id) {
+      resetForm();
+    }
+  } catch (error) {
+    console.log(error.response?.data || error);
+
+    toast.error("Silmək mümkün olmadı");
+  }
+}
   return (
     <div style={styles.wrap}>
       <div style={styles.panel}>

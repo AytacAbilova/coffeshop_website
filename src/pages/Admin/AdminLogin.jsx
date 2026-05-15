@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { setAdminAuthed } from "./adminStorage";
-
+import { setAdminAuthed, setAuthTokens } from "./adminStorage";
+import axios from "axios";
+import { toast } from "react-toastify";
 const styles = {
   page: {
     minHeight: "100vh",
@@ -134,35 +135,56 @@ const styles = {
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const validCredentials = useMemo(
-    () => ({ username: "admin", password: "admin123" }),
-    []
-  );
-
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
+
     setError("");
-    if (
-      username.trim() !== validCredentials.username ||
-      password !== validCredentials.password
-    ) {
+
+    try {
+      const res = await axios.post(
+        "https://simulation2-production-7983.up.railway.app/api/Auth/login",
+        {
+          email: username,
+          password,
+        }
+      );
+
+      console.log(res.data);
+
+      setAuthTokens({
+        accessToken: res.data?.accessToken,
+        refreshToken: res.data?.refreshToken,
+      });
+      localStorage.setItem("user", JSON.stringify(res.data));
+
+      // admin auth
+      setAdminAuthed();
+
+      toast.success("Uğurla daxil oldunuz");
+
+      navigate("/admin", { replace: true });
+    } catch (err) {
+      console.log(err);
+
       setError("Login məlumatları düzgün deyil.");
-      return;
+      toast.error("Login uğursuz oldu");
     }
-    setAdminAuthed();
-    navigate("/admin", { replace: true });
   }
 
   return (
     <div style={styles.page}>
       <div style={styles.bgPattern} />
+
       <div style={styles.card}>
         <div style={styles.ornament}>☕</div>
+
         <h1 style={styles.title}>Admin</h1>
+
         <p style={styles.sub}>Café Management</p>
 
         <div style={styles.divider}>
@@ -173,7 +195,7 @@ export default function AdminLogin() {
 
         <form style={styles.form} onSubmit={onSubmit}>
           <label style={styles.label}>
-            İstifadəçi adı
+            Email
             <input
               style={styles.input}
               value={username}
@@ -201,8 +223,6 @@ export default function AdminLogin() {
             Daxil ol
           </button>
         </form>
-
-        <p style={styles.hint}>admin / admin123</p>
       </div>
     </div>
   );

@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react";
-import { ensureTableCount, getTables, saveTables } from "./adminStorage";
+import { useLoaderData } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { saveTables } from "./adminStorage";
 
 const coffee = {
   gold: "#c18641",
@@ -53,6 +56,16 @@ const styles = {
     height: "1px",
     background: `linear-gradient(90deg, ${coffee.goldBorder}, transparent)`,
   },
+  subTitle: {
+    margin: "18px 0 10px",
+    fontSize: "9px",
+    letterSpacing: "4px",
+    textTransform: "uppercase",
+    color: coffee.muted,
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  },
   field: {
     display: "grid",
     gap: "6px",
@@ -70,7 +83,6 @@ const styles = {
     outline: "none",
     fontSize: "13px",
     fontFamily: "'Georgia', serif",
-    maxWidth: "160px",
   },
   actions: { display: "flex", gap: "8px", flexWrap: "wrap" },
   button: (variant) => ({
@@ -86,6 +98,32 @@ const styles = {
     textTransform: "uppercase",
     fontFamily: "'Georgia', serif",
   }),
+  buttonPrimary: {
+    padding: "10px 18px",
+    borderRadius: "2px",
+    border: `1px solid ${coffee.goldBorderStrong}`,
+    background: `linear-gradient(135deg, rgba(193,134,65,0.18) 0%, rgba(193,134,65,0.08) 100%)`,
+    color: coffee.brown,
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "10px",
+    letterSpacing: "2px",
+    textTransform: "uppercase",
+    fontFamily: "'Georgia', serif",
+  },
+  toolbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginTop: "12px",
+  },
+  grid2: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: "12px",
+  },
   hint: {
     margin: "14px 0 0",
     color: coffee.muted,
@@ -132,6 +170,7 @@ const styles = {
     fontSize: "13px",
     letterSpacing: "1px",
   },
+  meta: { margin: "0 0 12px", color: coffee.muted, fontSize: "12px" },
   chip: (status) => {
     const s = STATUS_STYLE[status] || STATUS_STYLE.available;
     return {
@@ -156,12 +195,191 @@ const styles = {
     fontSize: "12px",
     fontFamily: "'Georgia', serif",
   },
+  cardActions: {
+    marginTop: "10px",
+    display: "flex",
+    gap: "8px",
+    flexWrap: "wrap",
+  },
+  errorBox: {
+    marginTop: "14px",
+    padding: "10px 14px",
+    borderRadius: "2px",
+    border: "1px solid rgba(220, 80, 60, 0.35)",
+    background: "rgba(220, 80, 60, 0.08)",
+    color: "#b45309",
+    fontSize: "12px",
+    letterSpacing: "0.5px",
+  },
 };
-
+const API_URL = "https://simulation2-production-7983.up.railway.app/api/Tables";
 export default function AdminTables() {
-  const [tables, setTables] = useState(() => getTables());
-  const [count, setCount] = useState(() => getTables().length);
+  const loaderData = useLoaderData();
+  const [tables, setTables] = useState(() => {
+    const raw = Array.isArray(loaderData) ? loaderData : [];
+    const next = raw.map((t) => {
+      const id = t?.id ?? t?.tableId ?? t?.tableID ?? t?.number ?? "";
+      const number = Number(t?.number);
+      const capacity = Number(t?.capacity ?? t?.seats ?? 4);
+      const status =
+        typeof t?.status === "string"
+          ? t.status
+          : t?.isAvailable === true
+            ? "available"
+            : "reserved";
 
+      return {
+        id,
+        number: Number.isFinite(number) ? number : 0,
+        capacity: Number.isFinite(capacity) ? capacity : 0,
+        status,
+      };
+    });
+    saveTables(next);
+    return next;
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [createDraft, setCreateDraft] = useState({
+    number: "",
+    capacity: "",
+    status: "available",
+  });
+  const [editingId, setEditingId] = useState(null);
+  const [editDraft, setEditDraft] = useState({
+    number: "",
+    capacity: "",
+    status: "available",
+  });
+
+  function normalizeTable(t) {
+    const id = t?.id ?? t?.tableId ?? t?.tableID ?? t?.number ?? "";
+    const number = Number(t?.number);
+    const capacity = Number(t?.capacity ?? t?.seats ?? 4);
+    const status =
+      typeof t?.status === "string"
+        ? t.status
+        : t?.isAvailable === true
+          ? "available"
+          : "reserved";
+
+    return {
+      id,
+      number: Number.isFinite(number) ? number : 0,
+      capacity: Number.isFinite(capacity) ? capacity : 0,
+      status,
+    };
+  }
+
+  async function fetchTables() {
+    setError("");
+    setLoading(true);
+    try {
+      const res = await axios.get(API_URL);
+      const next = Array.isArray(res.data) ? res.data.map(normalizeTable) : [];
+      setTables(next);
+      saveTables(next);
+    } catch (e) {
+      setError("Masaları yükləmək mümkün olmadı.");
+      console.log(e?.response?.data || e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onCreate(e) {
+    e.preventDefault();
+    setError("");
+
+    const number = Number(createDraft.number);
+    const capacity = Number(createDraft.capacity);
+    const status = createDraft.status;
+
+    if (!Number.isFinite(number) || number < 1) return;
+    if (!Number.isFinite(capacity) || capacity < 1) return;
+
+    try {
+      await axios.post(API_URL, { number, capacity, status });
+      toast.success("Masa əlavə olundu");
+      setCreateDraft({ number: "", capacity: "", status: "available" });
+      await fetchTables();
+    } catch (e) {
+      console.log(e?.response?.data || e);
+      toast.error("Masa əlavə etmək mümkün olmadı");
+    }
+  }
+
+  function startEdit(t) {
+    setEditingId(t.id);
+    setEditDraft({
+      number: String(t.number || ""),
+      capacity: String(t.capacity || ""),
+      status: t.status || "available",
+    });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditDraft({ number: "", capacity: "", status: "available" });
+  }
+
+  async function saveEdit(id) {
+    const number = Number(editDraft.number);
+    const capacity = Number(editDraft.capacity);
+    const status = editDraft.status;
+    if (!Number.isFinite(number) || number < 1) return;
+    if (!Number.isFinite(capacity) || capacity < 1) return;
+
+    try {
+      await axios.put(`${API_URL}/${id}`, { id, number, capacity, status });
+      toast.success("Masa yeniləndi");
+      cancelEdit();
+      await fetchTables();
+    } catch (e) {
+      console.log(e?.response?.data || e);
+      toast.error("Yeniləmək mümkün olmadı");
+    }
+  }
+
+  async function changeStatus(id, status) {
+    const current = tables.find((t) => t.id === id);
+    if (!current) return;
+
+    const optimistic = tables.map((t) => (t.id === id ? { ...t, status } : t));
+    setTables(optimistic);
+    saveTables(optimistic);
+
+    try {
+      await axios.put(`${API_URL}/${id}`, {
+        id,
+        number: Number(current.number),
+        capacity: Number(current.capacity),
+        status,
+      });
+    } catch (e) {
+      console.log(e?.response?.data || e);
+      toast.error("Status yenilənmədi");
+      await fetchTables();
+    }
+  }
+
+  async function onDelete(id) {
+    const ok = window.confirm("Bu masanı silmək istədiyinizə əminsiniz?");
+    if (!ok) return;
+
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      toast.success("Masa silindi");
+      const next = tables.filter((t) => t.id !== id);
+      setTables(next);
+      saveTables(next);
+      if (editingId === id) cancelEdit();
+    } catch (e) {
+      console.log(e?.response?.data || e);
+      toast.error("Silmək mümkün olmadı");
+    }
+  }
   const stats = useMemo(() => {
     const s = { available: 0, reserved: 0, occupied: 0, disabled: 0 };
     for (const t of tables) {
@@ -170,22 +388,6 @@ export default function AdminTables() {
     return s;
   }, [tables]);
 
-  function persist(next) { setTables(next); saveTables(next); }
-
-  function applyCount() {
-    const next = ensureTableCount(tables, Number(count));
-    persist(next);
-    setCount(next.length);
-  }
-
-  function setStatus(number, status) {
-    persist(tables.map((t) => (t.number === number ? { ...t, status } : t)));
-  }
-
-  function setAll(status) {
-    persist(tables.map((t) => ({ ...t, status })));
-  }
-
   return (
     <div style={{ display: "grid", gap: "16px" }}>
       <div style={styles.panel}>
@@ -193,21 +395,7 @@ export default function AdminTables() {
           Masa idarəetməsi
           <span style={styles.labelLine} />
         </p>
-
-        <div style={{ marginTop: "18px", display: "grid", gap: "14px" }}>
-          <label style={styles.field}>
-            Masa sayı
-            <input style={styles.input} type="number" min={0} value={count} onChange={(e) => setCount(e.target.value)} />
-          </label>
-
-          <div style={styles.actions}>
-            <button style={styles.button()} type="button" onClick={applyCount}>Tətbiq et</button>
-            <button style={styles.button()} type="button" onClick={() => setAll("available")}>Hamısı boş</button>
-            <button style={styles.button()} type="button" onClick={() => setAll("reserved")}>Hamısı rezerv</button>
-            <button style={styles.button("danger")} type="button" onClick={() => setAll("occupied")}>Hamısı dolu</button>
-            <button style={styles.button()} type="button" onClick={() => setAll("disabled")}>Hamısı bağlı</button>
-          </div>
-
+        <div style={styles.toolbar}>
           <div style={styles.hint}>
             {Object.entries(stats).map(([key, val]) => (
               <span key={key}>
@@ -216,7 +404,66 @@ export default function AdminTables() {
               </span>
             ))}
           </div>
+
+          <div style={styles.actions}>
+            <button style={styles.buttonPrimary} type="button" onClick={fetchTables}>
+              {loading ? "Yüklənir..." : "Yenilə"}
+            </button>
+          </div>
         </div>
+
+        <p style={styles.subTitle}>
+          Yeni masa
+          <span style={styles.labelLine} />
+        </p>
+
+        <form onSubmit={onCreate} style={{ display: "grid", gap: "12px" }}>
+          <div style={styles.grid2}>
+            <label style={styles.field}>
+              Nömrə
+              <input
+                style={styles.input}
+                type="number"
+                min={1}
+                value={createDraft.number}
+                onChange={(e) => setCreateDraft((d) => ({ ...d, number: e.target.value }))}
+                required
+              />
+            </label>
+            <label style={styles.field}>
+              Tutum
+              <input
+                style={styles.input}
+                type="number"
+                min={1}
+                value={createDraft.capacity}
+                onChange={(e) => setCreateDraft((d) => ({ ...d, capacity: e.target.value }))}
+                required
+              />
+            </label>
+            <label style={styles.field}>
+              Status
+              <select
+                style={styles.select}
+                value={createDraft.status}
+                onChange={(e) => setCreateDraft((d) => ({ ...d, status: e.target.value }))}
+              >
+                <option value="available">Boş</option>
+                <option value="reserved">Rezerv</option>
+                <option value="occupied">Dolu</option>
+                <option value="disabled">Bağlı</option>
+              </select>
+            </label>
+          </div>
+
+          <div style={styles.actions}>
+            <button style={styles.button()} type="submit">
+              Əlavə et
+            </button>
+          </div>
+        </form>
+
+        {error ? <div style={styles.errorBox}>{error}</div> : null}
       </div>
 
       <div style={styles.panel}>
@@ -226,17 +473,86 @@ export default function AdminTables() {
         </p>
         <div style={styles.grid}>
           {tables.map((t) => (
-            <div key={t.number} style={styles.card}>
+            <div key={t.id} style={styles.card}>
               <div style={styles.cardTop}>
                 <p style={styles.number}>Masa #{t.number}</p>
                 <span style={styles.chip(t.status)}>{STATUS_LABEL[t.status] || t.status}</span>
               </div>
-              <select style={styles.select} value={t.status} onChange={(e) => setStatus(t.number, e.target.value)}>
-                <option value="available">Boş</option>
-                <option value="reserved">Rezerv</option>
-                <option value="occupied">Dolu</option>
-                <option value="disabled">Bağlı</option>
-              </select>
+              <p style={styles.meta}>Tutum: {t.capacity || "-"}</p>
+
+              {editingId === t.id ? (
+                <>
+                  <label style={styles.field}>
+                    Nömrə
+                    <input
+                      style={styles.input}
+                      type="number"
+                      min={1}
+                      value={editDraft.number}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, number: e.target.value }))}
+                      required
+                    />
+                  </label>
+                  <label style={styles.field}>
+                    Tutum
+                    <input
+                      style={styles.input}
+                      type="number"
+                      min={1}
+                      value={editDraft.capacity}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, capacity: e.target.value }))}
+                      required
+                    />
+                  </label>
+                  <label style={styles.field}>
+                    Status
+                    <select
+                      style={styles.select}
+                      value={editDraft.status}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, status: e.target.value }))}
+                    >
+                      <option value="available">Boş</option>
+                      <option value="reserved">Rezerv</option>
+                      <option value="occupied">Dolu</option>
+                      <option value="disabled">Bağlı</option>
+                    </select>
+                  </label>
+
+                  <div style={styles.cardActions}>
+                    <button style={styles.button()} type="button" onClick={() => saveEdit(t.id)}>
+                      Yadda saxla
+                    </button>
+                    <button style={styles.button("danger")} type="button" onClick={cancelEdit}>
+                      Ləğv et
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <label style={styles.field}>
+                    Status
+                    <select
+                      style={styles.select}
+                      value={t.status}
+                      onChange={(e) => changeStatus(t.id, e.target.value)}
+                    >
+                      <option value="available">Boş</option>
+                      <option value="reserved">Rezerv</option>
+                      <option value="occupied">Dolu</option>
+                      <option value="disabled">Bağlı</option>
+                    </select>
+                  </label>
+
+                  <div style={styles.cardActions}>
+                    <button style={styles.button()} type="button" onClick={() => startEdit(t)}>
+                      Dəyiş
+                    </button>
+                    <button style={styles.button("danger")} type="button" onClick={() => onDelete(t.id)}>
+                      Sil
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>
