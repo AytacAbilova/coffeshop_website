@@ -178,6 +178,34 @@
   line-height: 22px;
 }
 
+.reservationProfile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.reservationProfileLabel {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #d8a25e;
+  font-weight: 800;
+}
+
+.reservationProfileValue {
+  margin: 8px 0 0;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 18px;
+}
+
 .reservationForm button {
   width: 100%;
   padding: 18px;

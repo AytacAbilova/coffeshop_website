@@ -1,54 +1,113 @@
-import { useMemo, useState } from "react";
-import { createReservation, getTables } from "../Admin/adminStorage";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  apiCreateReservation,
+  apiGetTables,
+  getAccessToken,
+  getCurrentUser,
+} from "../Admin/adminStorage";
 import "./Reservation.css";
 
 function Reservation() {
-  const availableTables = useMemo(
-    () => getTables().filter((t) => t && t.status === "available"),
-    []
-  );
+  const navigate = useNavigate();
+  const user = useMemo(() => getCurrentUser(), []);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [tables, setTables] = useState([]);
+  const availableTables = useMemo(
+    () =>
+      tables.filter(
+        (t) => t && Number.isFinite(Number(t.id)) && Number(t.status) === 1
+      ),
+    [tables]
+  );
+  const [tablesLoading, setTablesLoading] = useState(false);
+
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [guests, setGuests] = useState("");
-  const [phone, setPhone] = useState("");
-  const [tableNumber, setTableNumber] = useState("");
-  const [note, setNote] = useState("");
+  const [durationHours, setDurationHours] = useState("2");
+  const [tableId, setTableId] = useState("");
   const [success, setSuccess] = useState("");
 
-  function onSubmit(e) {
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setTablesLoading(true);
+      const res = await apiGetTables();
+      if (!alive) return;
+      if (!res.ok) {
+        setTables([]);
+        setTablesLoading(false);
+        return;
+      }
+      const list = Array.isArray(res.data) ? res.data : [];
+      const normalized = list.map((t) => ({
+        id: Number(t.id),
+        number: Number(t.number),
+        capacity: Number(t.capacity),
+        status: Number(t.status),
+      }));
+      setTables(normalized);
+      setTablesLoading(false);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  function buildIsoLocal(dateStr, timeStr) {
+    if (!dateStr || !timeStr) return "";
+    const d = new Date(`${dateStr}T${timeStr}`);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toISOString();
+  }
+
+  const endPreview = useMemo(() => {
+    const startIso = buildIsoLocal(date, time);
+    const hours = Number(durationHours) || 0;
+    const startMs = startIso ? Date.parse(startIso) : NaN;
+    if (!Number.isFinite(startMs) || hours <= 0) return "";
+    const end = new Date(startMs + hours * 60 * 60 * 1000);
+    return end.toLocaleString("az-AZ");
+  }, [date, time, durationHours]);
+
+  async function onSubmit(e) {
     e.preventDefault();
     setSuccess("");
 
-    const payload = {
-      customer: {
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-      },
-      date,
-      time,
-      guests: Number(guests) || 0,
-      tableNumber: tableNumber ? Number(tableNumber) : null,
-      note: note.trim(),
-    };
+    if (!getAccessToken()) {
+      toast.error("Rezervasiya üçün əvvəlcə login olun.");
+      navigate("/login");
+      return;
+    }
 
-    if (!payload.customer.name) return;
-    if (!payload.customer.phone) return;
-    if (!payload.date || !payload.time) return;
-    if (!payload.guests || payload.guests < 1) return;
+    const startIso = buildIsoLocal(date, time);
+    const hours = Number(durationHours) || 0;
+    const startMs = startIso ? Date.parse(startIso) : NaN;
+    const endIso =
+      Number.isFinite(startMs) && hours > 0
+        ? new Date(startMs + hours * 60 * 60 * 1000).toISOString()
+        : "";
 
-    createReservation(payload);
-    setName("");
-    setEmail("");
+    const tid = Number(tableId);
+    if (!Number.isFinite(tid) || tid <= 0) return;
+    if (!startIso || !endIso) return;
+
+    const res = await apiCreateReservation({
+      tableId: tid,
+      startDatetime: startIso,
+      endDatetime: endIso,
+    });
+
+    if (!res.ok) {
+      toast.error("Rezervasiya alınmadı.");
+      return;
+    }
+
     setDate("");
     setTime("");
-    setGuests("");
-    setPhone("");
-    setTableNumber("");
-    setNote("");
+    setDurationHours("2");
+    setTableId("");
     setSuccess("Rezervasiyanız qəbul olundu. /myorders bölməsində görə bilərsiniz.");
   }
 
@@ -88,20 +147,18 @@ function Reservation() {
 
             {success ? <div className="reservationNotice">{success}</div> : null}
 
-            <input
-              type="text"
-              placeholder="Your Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <div className="reservationProfile">
+              <div>
+                <p className="reservationProfileLabel">Customer</p>
+                <p className="reservationProfileValue">
+                  {user?.fullName || user?.customerFullName || user?.email || "Guest"}
+                </p>
+              </div>
+              <div>
+                <p className="reservationProfileLabel">Email</p>
+                <p className="reservationProfileValue">{user?.email || "-"}</p>
+              </div>
+            </div>
 
             <div className="doubleInput">
               <input
@@ -120,50 +177,38 @@ function Reservation() {
             </div>
 
             <div className="doubleInput">
-              <input
-                type="number"
-                min={1}
-                placeholder="Guests"
-                value={guests}
-                onChange={(e) => setGuests(e.target.value)}
+              <select
+                value={durationHours}
+                onChange={(e) => setDurationHours(e.target.value)}
                 required
-              />
+              >
+                <option value="1">1 saat</option>
+                <option value="2">2 saat</option>
+                <option value="3">3 saat</option>
+                <option value="4">4 saat</option>
+              </select>
 
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
+              <input type="text" value={endPreview ? `Bitmə: ${endPreview}` : ""} readOnly />
             </div>
 
             <div className="doubleInput">
               <select
-                value={tableNumber}
-                onChange={(e) => setTableNumber(e.target.value)}
+                value={tableId}
+                onChange={(e) => setTableId(e.target.value)}
+                required
               >
-                <option value="">Select table (optional)</option>
+                <option value="">
+                  {tablesLoading ? "Tables yüklənir..." : "Select table"}
+                </option>
                 {availableTables.map((t) => (
-                  <option key={t.number} value={t.number}>
-                    Table #{t.number}
+                  <option key={t.id} value={t.id}>
+                    Table #{t.number} · Seats: {t.capacity} · Status:{" "}
+                    {t.status === 1 ? "Available" : t.status === 2 ? "Reserved" : "Occupied"}
                   </option>
                 ))}
               </select>
-
-              <input
-                type="text"
-                placeholder="Location (optional)"
-                value="Baku"
-                readOnly
-              />
+              <input type="text" value="Baku" readOnly />
             </div>
-
-            <textarea
-              placeholder="Special Request"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            ></textarea>
 
             <button type="submit">BOOK A TABLE</button>
           </form>

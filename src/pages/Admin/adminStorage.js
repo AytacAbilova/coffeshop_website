@@ -222,7 +222,23 @@ async function authorizedJsonFetch(path, options = {}) {
     },
   });
 
-  if (!res.ok) return { ok: false, status: res.status, data: null };
+  if (!res.ok) {
+    if (res.status === 401) {
+      clearAdminAuth();
+      clearAuthTokens();
+      try {
+        localStorage.removeItem("user");
+      } catch {
+        return { ok: false, status: 401, data: null };
+      }
+
+      if (typeof window !== "undefined") {
+        const isAdminPath = window.location.pathname.startsWith("/admin");
+        window.location.assign(isAdminPath ? "/admin/login" : "/login");
+      }
+    }
+    return { ok: false, status: res.status, data: null };
+  }
 
   try {
     const data = await res.json();
@@ -274,12 +290,41 @@ export async function apiGetOrdersByCustomer(customerId) {
     return { ok: false, status: 400, data: null };
   }
 
-  return await authorizedJsonFetch(`/api/Orders/${cid}`);
+  return await authorizedJsonFetch(`/api/Orders/customer/${cid}`);
 }
 
 
 export async function apiGetOrdersByTable(tableId) {
   return await authorizedJsonFetch(`/api/Orders?tableId=${Number(tableId)}`);
+}
+
+export async function apiCreateReservation({ tableId, startDatetime, endDatetime }) {
+  const payload = {
+    tableId: Number(tableId) || 0,
+    startDatetime,
+    endDatetime,
+  };
+
+  return await authorizedJsonFetch("/api/Reservations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiGetMyReservations() {
+  return await authorizedJsonFetch("/api/Reservations/my-reservations");
+}
+
+export async function apiGetTables() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/Tables`);
+    if (!res.ok) return { ok: false, status: res.status, data: null };
+    const data = await res.json();
+    return { ok: true, status: res.status, data };
+  } catch {
+    return { ok: false, status: 0, data: null };
+  }
 }
 
 export function getMenuItems() {

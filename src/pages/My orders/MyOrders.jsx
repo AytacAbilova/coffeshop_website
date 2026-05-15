@@ -5,8 +5,8 @@ import { useLoaderData } from "react-router-dom";
 import {
   apiDeleteOrder,
   apiGetOrdersByCustomer,
+  apiGetMyReservations,
   getCurrentUserId,
-  getReservations,
 } from "../Admin/adminStorage";
 import "./MyOrders.css";
 
@@ -26,12 +26,14 @@ function normalizeOrder(o) {
 }
 
 export default function MyOrders() {
-  const loaderOrders = useLoaderData();
+  const loaderData = useLoaderData();
   const [tab, setTab] = useState("orders");
   const [orders, setOrders] = useState(() =>
-    Array.isArray(loaderOrders) ? loaderOrders.map(normalizeOrder) : []
+    Array.isArray(loaderData?.orders) ? loaderData.orders.map(normalizeOrder) : []
   );
-  const [reservations, setReservations] = useState(() => getReservations());
+  const [reservations, setReservations] = useState(() =>
+    Array.isArray(loaderData?.reservations) ? loaderData.reservations : []
+  );
   const [loading, setLoading] = useState(false);
   const [menuMap, setMenuMap] = useState(() => new Map());
 
@@ -39,11 +41,10 @@ export default function MyOrders() {
   const reservationsCount = useMemo(() => reservations.length, [reservations]);
 
   async function refresh() {
-    setReservations(getReservations());
-
     const customerId = getCurrentUserId();
     if (!customerId) {
       setOrders([]);
+      setReservations([]);
       return;
     }
 
@@ -53,14 +54,23 @@ export default function MyOrders() {
       if (!res.ok) {
         toast.error("Sifarişləri yükləmək olmadı");
         setOrders([]);
-        return;
+      } else {
+        const list = Array.isArray(res.data) ? res.data.map(normalizeOrder) : [];
+        setOrders(list);
       }
-      const list = Array.isArray(res.data) ? res.data.map(normalizeOrder) : [];
-      setOrders(list);
+
+      const r = await apiGetMyReservations();
+      if (!r.ok) {
+        toast.error("Rezervasiyanı yükləmək olmadı");
+        setReservations([]);
+      } else {
+        setReservations(Array.isArray(r.data) ? r.data : []);
+      }
     } catch (e) {
       console.log(e);
       toast.error("Xəta baş verdi");
       setOrders([]);
+      setReservations([]);
     } finally {
       setLoading(false);
     }
@@ -221,22 +231,21 @@ export default function MyOrders() {
                     <div>
                       <p className="myorders-cardTitle">Masa rezervasiyası</p>
                       <p className="myorders-cardMeta">
-                        {formatDate(r.createdAt)} · Status: {r.status || "pending"}
+                        {formatDate(r.startDatetime)} · Status: {r.status || "pending"}
                       </p>
                       <p className="myorders-cardMeta">
-                        Tarix/Saat: {r.date || "-"} {r.time || "-"} · Nəfər:{" "}
-                        {r.guests || "-"}
+                        Başlanğıc: {formatDate(r.startDatetime)} · Bitmə:{" "}
+                        {formatDate(r.endDatetime)}
                       </p>
                       <p className="myorders-cardMeta">
-                        Müştəri: {r.customer?.name || "-"} · {r.customer?.phone || "-"}
+                        Müştəri: {r.customerFullName || "-"} · {r.customerEmail || "-"}
                       </p>
                     </div>
                     <div className="myorders-pill">
-                      {r.tableNumber ? `Masa #${r.tableNumber}` : "Masa seçilməyib"}
+                      Masa #{r.tableNumber} · Tutum: {r.tableCapacity}
                     </div>
                   </div>
 
-                  {r.note ? <p className="myorders-note">Qeyd: {r.note}</p> : null}
                 </div>
               ))
             )}

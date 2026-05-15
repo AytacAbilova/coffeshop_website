@@ -20,6 +20,7 @@ import AdminStaff from "./pages/Admin/AdminStaff";
 import AdminTables from "./pages/Admin/AdminTables";
 import {
   apiGetOrdersByCustomer,
+  apiGetMyReservations,
   clearAdminAuth,
   clearAuthTokens,
   ensureValidAccessToken,
@@ -154,13 +155,15 @@ const adminTablesLoader = async () => {
 
 const myOrdersLoader = async () => {
   const customerId = getCurrentUserId();
-  if (!customerId) return [];
+  if (!customerId) return { orders: [], reservations: [] };
   try {
     const res = await apiGetOrdersByCustomer(customerId);
-    if (!res.ok) return [];
-    return Array.isArray(res.data) ? res.data : [];
+    const orders = res.ok && Array.isArray(res.data) ? res.data : [];
+    const r = await apiGetMyReservations();
+    const reservations = r.ok && Array.isArray(r.data) ? r.data : [];
+    return { orders, reservations };
   } catch {
-    return [];
+    return { orders: [], reservations: [] };
   }
 };
 
